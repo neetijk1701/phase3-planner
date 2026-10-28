@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Phase 3 Planner</title>
+<meta name="description" content="Plan your WashU Medicine Phase 3 rotations against the graduation requirements.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#a51417">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Phase 3">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+/* Layout: one working column. Summary of requirements first, then the month calendar, then checklist and rules. */
+:root{
+  --bg:#f8f7f5; --surface:#ffffff; --sunk:#f1eeeb; --ink:#1e1a19; --muted:#6b6361; --line:#e4dedb;
+  --accent:#a51417; --accent-soft:#f6e3e3; --on-accent:#ffffff;
+  --done:#2c6e49; --reg:#3a6ea5; --plan:#b9b0ad; --warn:#9a5b00; --warn-bg:#fff4e0; --bad:#b3261e; --bad-bg:#fdecea;
+  --t-acr:#7a1f5c; --t-kisc:#2f5d8a; --t-elec:#4a6b2f; --t-cap:#8a5a00; --t-oth:#5e5653;
+  --display:"Fraunces",Georgia,serif; --body:"Source Sans 3",-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161312; --surface:#201c1b; --sunk:#2a2523; --ink:#f1ebe8; --muted:#a99e9b; --line:#3a3331;
+  --accent:#e2575b; --accent-soft:#3a1f20; --on-accent:#1a0c0c;
+  --done:#5fbf86; --reg:#7aa9dc; --plan:#6b6260; --warn:#f0b35a; --warn-bg:#3a2c12; --bad:#ff8a80; --bad-bg:#3d1c1a;
+  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161312; --surface:#201c1b; --sunk:#2a2523; --ink:#f1ebe8; --muted:#a99e9b; --line:#3a3331;
+  --accent:#e2575b; --accent-soft:#3a1f20; --on-accent:#1a0c0c;
+  --done:#5fbf86; --reg:#7aa9dc; --plan:#6b6260; --warn:#f0b35a; --warn-bg:#3a2c12; --bad:#ff8a80; --bad-bg:#3d1c1a;
+  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+#app{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1{font:600 clamp(28px,5vw,40px)/1.1 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font:600 21px/1.25 var(--display);margin:0;text-wrap:balance}
+h3{font-size:15px;margin:0;font-weight:700}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.mono{font-family:var(--mono);font-size:.85em}
+.head{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.head .meta{font-size:14px;color:var(--muted);max-width:52ch}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 13px;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.section{display:flex;flex-direction:column;gap:14px}
+.section-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.banner{background:var(--accent-soft);border-radius:10px;padding:10px 14px;font-size:14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+
+/* Summary */
+.total{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;align-items:center}
+.total .big{font:600 44px/1 var(--display);font-variant-numeric:tabular-nums}
+.total .big small{font:400 18px var(--body);color:var(--muted)}
+.bar{height:10px;border-radius:5px;background:var(--sunk);display:flex;overflow:hidden}
+.bar i{display:block;height:100%}
+.bar .d{background:var(--done)} .bar .r{background:var(--reg)} .bar .p{background:var(--plan)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;background:var(--c);vertical-align:0}
+.reqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.req{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;background:var(--surface);min-width:0}
+.req .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.req .num{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.req .sub{font-size:13px;color:var(--muted)}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;white-space:nowrap}
+.pill.ok{background:color-mix(in srgb,var(--done) 16%,transparent);color:var(--done)}
+.pill.reg{background:color-mix(in srgb,var(--reg) 16%,transparent);color:var(--reg)}
+.pill.short{background:var(--sunk);color:var(--muted)}
+.pill.over{background:var(--bad-bg);color:var(--bad)}
+.warns{display:flex;flex-direction:column;gap:6px}
+.warn{background:var(--warn-bg);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:14px}
+.warn.bad{background:var(--bad-bg)}
+.warn b{color:var(--warn)} .warn.bad b{color:var(--bad)}
+
+/* Calendar */
+.cal{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.cal-head,.mrow{display:grid;grid-template-columns:96px minmax(0,1fr) minmax(0,1fr);gap:6px;padding:6px 10px;align-items:start}
+.cal-head{background:var(--sunk);font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.mrow{border-top:1px solid var(--line);min-height:52px}
+.mrow .mlab{grid-column:1;grid-row:1 / span 6;font-weight:700;font-size:14px;padding-top:6px;font-variant-numeric:tabular-nums}
+.mrow .mlab small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.slot{min-width:0}
+.s-full{grid-column:2 / span 2}.s-ab{grid-column:2}.s-cd{grid-column:3}
+.chip{display:flex;flex-direction:column;gap:1px;text-align:left;width:100%;border:1px solid var(--line);border-left:4px solid var(--tc);border-radius:7px;background:var(--surface);padding:5px 9px;min-width:0}
+.chip:hover{border-color:var(--muted);border-left-color:var(--tc)}
+.chip .ct{font-weight:600;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.chip .cm{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 8px}
+.chip.st-planned{border-style:dashed;border-left-style:solid}
+.chip.conflict{box-shadow:0 0 0 2px var(--bad)}
+.add{border:1px dashed var(--line);background:transparent;border-radius:7px;color:var(--muted);font-size:13px;padding:8px;width:100%;text-align:left}
+.add:hover{color:var(--ink);border-color:var(--muted)}
+.typetag{font-weight:700;color:var(--tc)}
+.longrow{border-top:1px solid var(--line);padding:8px 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.longrow .chip{width:auto}
+
+/* Modal */
+.scrim{position:fixed;inset:0;background:rgba(10,8,8,.45);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));overflow:auto}
+.modal{background:var(--surface);border-radius:14px;width:min(620px,100%);margin-top:4vh;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label,.flabel{font-size:13px;font-weight:700;color:var(--muted)}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.results{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.res{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:8px 10px}
+.res:last-child{border-bottom:0}
+.res:hover,.res.sel{background:var(--sunk)}
+.res .rt{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.res .rc{grid-column:1;font-size:12px;color:var(--muted)}
+.res .rw{grid-row:1 / span 2;grid-column:2;align-self:center;font-size:12px;font-weight:700;color:var(--tc)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);padding:7px 12px;font-size:14px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.chosen{border:1px solid var(--line);border-left:4px solid var(--tc);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+
+/* Checklist and rules */
+.checks{display:flex;flex-direction:column;gap:8px}
+.checks label{display:flex;gap:10px;align-items:flex-start}
+.checks input{margin-top:4px;width:18px;height:18px;accent-color:var(--accent)}
+.rules-list{display:flex;flex-direction:column;gap:0}
+.rl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 16px;padding:10px 0;border-top:1px solid var(--line)}
+.rl:first-child{border-top:0}
+.rl .rv{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rl .rd{grid-column:1 / -1;font-size:13px;color:var(--muted)}
+.notes{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.edit-rule{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.tags{display:flex;flex-wrap:wrap;gap:12px;font-size:14px}
+.tags label{display:flex;gap:5px;align-items:center}
+.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;z-index:60}
+@media (max-width:620px){
+  .cal-head{display:none}
+  .mrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .mrow .mlab{grid-column:1 / -1;grid-row:auto;padding-top:2px}
+  .s-full{grid-column:1 / -1}.s-ab{grid-column:1}.s-cd{grid-column:2}
+  .total{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:no-preference){.chip,.btn,.res{transition:border-color .12s,background .12s}}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"><p class="muted">Loading the planner…</p></main>
+
+<script id="p3-rules" type="application/json">{"reviewed":"2026-10-28","source":"Washington University Bulletin 2026–27, Doctor of Medicine (public)","calendar":{"start":"2026-03","end":"2027-05"},"rules":[{"id":"total","label":"Total Phase 3 weeks","kind":"min","weeks":64,"all":true,"tags":[],"codes":[],"away":"any","note":""},{"id":"acr","label":"Advanced Clinical Rotations (ACRs)","kind":"min","weeks":12,"all":false,"tags":["ACR"],"codes":[],"away":"any","note":"Three 4-week ACRs, including the Internal Medicine ACR. The bulletin says the remaining two must be completed at WashU."},{"id":"imacr","label":"Internal Medicine ACR","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDICINE 9100"],"away":"any","note":""},{"id":"kisc","label":"KISCs","kind":"min","weeks":8,"all":false,"tags":["KISC"],"codes":[],"away":"any","note":"MSTP students take none."},{"id":"elec","label":"Electives","kind":"min","weeks":32,"all":false,"tags":["ELEC"],"codes":[],"away":"any","note":"Away electives and up to 4 weeks of Step study count here."},{"id":"cap","label":"Phase 3 Capstone","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8040"],"away":"any","note":""},{"id":"step","label":"Step study time","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8010"],"away":"any","note":"Counts toward electives."},{"id":"away","label":"Away electives","kind":"max","weeks":12,"all":false,"tags":[],"codes":["MEDPHASE3 9998"],"away":"any","note":""},{"id":"intl","label":"International away electives","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 9999"],"away":"any","note":""}],"checklist":["Pass the Comprehensive Clinical Exam (MEDICINE 8330)","Take USMLE Step 1 before graduation","Take USMLE Step 2 CK before graduation"],"deadlines":[],"notes":["ACRs, KISCs, electives and the Capstone add up to 56 of the 64 weeks. The bulletin doesn't say what the other 8 weeks are."]}</script>
+
+<script id="p3-catalog" type="application/json">[
+["ANESTH 8000","General Anesthesiology (Clinical Elective)","4","ELEC FOURWO"],
+["ANESTH 8010","Cardiothoracic Anesthesiology (Clinical Elective)","4","ELEC FOURWO"],
+["ANESTH 8015","Pediatric Anesthesiology (Clinical Elective)","2","ELEC TWOWR"],
+["ANESTH 8020","CTICU: Cardiothoracic Intensive Care Unit (Clinical Elective)","4","ELEC FOURWO"],
+["ANESTH 8030","Pain Management (Clinical Elective)","4","ELEC FOURWO"],
+["ANESTH 8040","Anesthesiology for Neurosurgery (Clinical Elective)","4","ELEC FOURWO"],
+["ANESTH 8050","Obstetrical Anesthesiology (Clinical Elective)","2","ELEC TWOWR"],
+["ANESTH 9100","Anesthesiology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["ANESTH 9150","Surgical Critical Care Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["EMED 8010","Medical Toxicology (Clinical Elective)","4","ELEC FOURWO"],
+["EMED 8015","Emergency Ultrasound (Clinical Elective)","2","ELEC TWOWR"],
+["EMED 8021","Emergency Medicine (Clinical Elective)","4","ELEC FOURWO"],
+["EMED 8301","EMS: Emergency Medical Services (Clinical Elective)","2","ELEC TWOWO"],
+["EMED 9100","Emergency Medicine Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["MEDICINE 8010","Rheumatology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8020","Geriatric Medicine (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8030","Inpatient Cardiology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8045","Cardiac Arrhythmias and Electrophysiology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8050","Heart Failure and Transplant Cardiology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8055","Dermatology (Clinical Elective)","4","ELEC FOURWO"],
+["MEDICINE 8075","Clinical Gastroenterology and Hepatology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8080","Management of Inflammatory Bowel Disease (Clinical Elective)","2","ELEC TWOWO"],
+["MEDICINE 8090","Hematology and Hemostasis (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8095","Bone and Mineral Diseases (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8100","Inpatient Infectious Diseases Consult Service (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8115","Ambulatory Infectious Disease (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8125","Inpatient Oncology Consult Service (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8135","Hospice and Palliative Medicine (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8140","Endocrinology, Diabetes, and Metabolism (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8145","Outpatient Oncology (Clinical Elective)","2","ELEC TWOWO"],
+["MEDICINE 8160","Pulmonary Medicine (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8165","Bone Marrow Transplantation and Stem Cell Biology (Clinical Elective)","4","ELEC FOURWO"],
+["MEDICINE 8175","Clinical Nephrology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8180","Kidney Transplantation (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8185","Adult Allergy and Clinical Immunology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8190","Interventional and Structural Cardiology (Clinical Elective)","2","ELEC TWOWR"],
+["MEDICINE 8300","Internal Medicine at Missouri Baptist for Visiting Students (Clinical Elective)","4","ELEC FOURWO"],
+["MEDICINE 8880","Outpatient Hematology (Clinical Elective)","4","ELEC FOURWO"],
+["MEDICINE 9100","Internal Medicine Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["MEDICINE 9150","Medicine Intensive Care Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["MEDINTER 8010","Hot Topics in Health Law: Where Medicine, Law, and Business Collide (Non-Clinical Elective)","2","ELEC TWOWO"],
+["MEDINTER 8015","Clinical Mentoring (Longitudinal Elective)","2","ELEC"],
+["MEDINTER 8016","Interprofessional Education (IPE) Student Teaching Certificate (Longitudinal Elective)","2","ELEC"],
+["MEDINTER 8021","Community-Based Family Medicine at Affinia Healthcare (Clinical Elective)","2","ELEC TWOWR"],
+["MEDINTER 8045","Ethical Challenges in Surgery and Medicine (Non-Clinical Elective)","4","ELEC FOURWO"],
+["MEDINTER 8055","Care of the Homeless (Non-Clinical Elective)","2","ELEC TWOWO"],
+["MEDINTER 8065","Medical Education Scholarship (Non-Clinical Elective)","2","ELEC TWOWR"],
+["MEDINTER 8070","Clinical Informatics (Non-Clinical Elective)","4","ELEC FOURWO"],
+["MEDINTER 8320","Patient Safety and Quality Improvement (Non-Clinical Elective)","4","ELEC FOURWO"],
+["MEDINTER 8580","Humanities in Medicine: Reflecting About Professional Identity (Non-Clinical Elective)","2","ELEC TWOWR"],
+["MEDINTER 8900","Dissecting the Past (Non-Clinical Elective)","4","ELEC FOURWO"],
+["MEDPHASE3 7000","Introduction to Addiction Medicine (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7005","Multidisciplinary Adult Neuro-Oncology (KISC)","2","KISC TWOWO"],
+["MEDPHASE3 7010","Diabetes Care From A to Z (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7015","Comprehensive Approach to Disability (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7020","Infectious Diseases and Health Equity (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7025","Integrated Oncology: Social Science and Clinical Research Perspectives Across the Cancer Continuum (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7030","Pediatric Neurocritical Care: Onset to Outcomes (KISC)","2","KISC TWOWO"],
+["MEDPHASE3 7035","Science, Medicine and Societal Effects of Pain (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7040","Advancing End-of-Life Care (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7045","Holistic and Interdisciplinary Approach to Surgical Critical Care (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7050","Precision Medicine: Incorporating Genomics Into Cutting-Edge Patient Care (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7055","Recognizing and Mitigating Maternal and Infant Health Disparities (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7060","Memory, Dementia, and Clinical Therapeutics (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 7065","Surgical Oncology (KISC)","2","KISC TWOWO"],
+["MEDPHASE3 7070","The AI Imperative (KISC)","2","KISC TWOWO"],
+["MEDPHASE3 7075","Integrated Abdominal Transplantation (KISC)","4","KISC FOURWO"],
+["MEDPHASE3 8010","Step Preparation","1-4","ELEC"],
+["MEDPHASE3 8040","Phase 3 Capstone","4","FOURWO"],
+["MEDPHASE3 9998","Away Elective","1-12","ELEC"],
+["MEDPHASE3 9999","International Away Elective","1-4","ELEC"],
+["NEUROL 8020","Neuro-Oncology (Clinical Elective)","4","ELEC FOURWO"],
+["NEUROL 8030","Neonatal Neurology (Clinical Elective)","2","ELEC TWOWR"],
+["NEUROL 8035","Pediatric Neurology (Clinical Elective)","4","ELEC FOURWO"],
+["NEUROL 8040","Neurointensive Care Unit (Clinical Elective)","4","ELEC FOURWO"],
+["NEUROL 8045","Adult Epilepsy (Clinical Elective)","2","ELEC TWOWR"],
+["NEUROL 8201","Neurology (Clinical Elective)","4","ELEC FOURWO"],
+["NEUROL 9100","Neurology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["NEUROSCI 8005","Advanced Dissection (Non-Clinical Elective)","4","ELEC FOURWO"],
+["NEUROSUR 8101","Neurosurgery (Clinical Elective)","4","ELEC FOURWO"],
+["NEUROSUR 9100","Neurosurgery Advanced Clinical Rotation (ACR)","4","ACR FOURWO","NEUROSUR 8101"],
+["OBGYN 8010","OBGYN Reproductive Endocrinology & Infertility (Clinical Elective)","4","ELEC FOURWO"],
+["OBGYN 8035","OBGYN Ultrasound - Genetics (Clinical Elective)","2","ELEC TWOWO"],
+["OBGYN 8040","Complex Family Planning (Clinical Elective)","4","ELEC FOURWO"],
+["OBGYN 8051","Outpatient OBGYN Generalist Care (Clinical Elective)","4","ELEC FOURWO"],
+["OBGYN 8450","Outpatient Maternal-Fetal Medicine (Clinical Elective)","4","ELEC FOURWO"],
+["OBGYN 9100","Inpatient Maternal-Fetal Medicine Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["OBGYN 9150","Gynecologic Oncology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["OPHTH 8010","Ophthalmology (Clinical Elective)","2","ELEC TWOWR"],
+["OPHTH 8015","Neuro-Ophthalmology (Clinical Elective)","2","ELEC TWOWR"],
+["OPHTH 8030","Orbital and Oculofacial Plastic Surgery (Clinical Elective)","2","ELEC TWOWR"],
+["OPHTH 9100","Ophthalmology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["ORTHO 8071","Physical Medicine and Rehabilitation (Clinical Elective)","2","ELEC TWOWR"],
+["ORTHO 8150","Orthopedic Surgery (Clinical Elective)","2","ELEC TWOWR"],
+["ORTHO 8160","PM&R Musculoskeletal and Sports Medicine (Clinical Elective)","2","ELEC TWOWR"],
+["ORTHO 8170","PM&R and Orthopedic Injury Clinic (Clinical Elective)","2","ELEC TWOWR"],
+["ORTHO 9100","Orthopedic Surgery Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["OTO 8030","Otolaryngology for Visiting Students (Clinical Elective)","4","ELEC FOURWO"],
+["OTO 8040","Otolaryngology (Clinical Elective)","2","ELEC TWOWR"],
+["OTO 9100","Otolaryngology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["PATH 8005","Autopsy Pathology (Clinical Elective)","2","ELEC TWOWR"],
+["PATH 8010","Dermatopathology (Clinical Elective)","4","ELEC FOURWO"],
+["PATH 8015","Cytopathology (Clinical Elective)","2","ELEC TWOWR"],
+["PATH 8020","Molecular Pathology (Clinical Elective)","4","ELEC FOURWO"],
+["PATH 8030","Surgical Pathology (Clinical Elective)","2","ELEC TWOWR"],
+["PATH 8035","Introduction to Neuropathology (Clinical Elective)","2","ELEC TWOWR"],
+["PATH 8045","Clinical Laboratory Medicine (Clinical Elective)","4","ELEC FOURWO"],
+["PATH 8170","OBGYN Pathology (Clinical Elective)","2","ELEC TWOWR"],
+["PATH 9100","Anatomic Pathology and Laboratory Medicine Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["PEDS 8010","Pediatric Asthma and Allergy (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8020","Pediatric Critical Care (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8025","Pediatric Cardiac Catheterization (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8030","Outpatient Pediatric Cardiology (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8035","Genetics and Genomic Medicine (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8045","Pediatric Rheumatology (Clinical Elective)","2","ELEC TWOWO"],
+["PEDS 8050","Pediatric Gastroenterology, Hepatology, and Nutrition (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8055","Antimicrobial Use, Resistance, and Stewardship (Clinical Elective)","2","ELEC TWOWO"],
+["PEDS 8060","Pediatric Infectious Diseases (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8065","Pediatric Emergency Medicine (Clinical Elective)","4","ELEC FOURWO"],
+["PEDS 8070","Child Abuse Pediatrics (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8075","Pediatric Endocrinology and Diabetes (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8080","Clinical Pediatric Pulmonary Medicine (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8085","Newborn Critical Care (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8090","Pediatric Clinical Immunology (Clinical Elective)","2","ELEC TWOWO"],
+["PEDS 8095","Pediatric Nephrology (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 8245","Pediatric Hematology and Oncology (Clinical Elective)","4","ELEC FOURWO"],
+["PEDS 8900","Primary Care Pediatrics (Clinical Elective)","2","ELEC TWOWR"],
+["PEDS 9100","Pediatrics Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["PEDS 9200","Newborn Critical Care Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["PEDS 9250","Pediatric Critical Care Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["PSY 8005","Psychiatry Consult (Clinical Elective)","4","ELEC FOURWO"],
+["PSY 8010","Outpatient Community Psychiatry (Clinical Elective)","4","ELEC FOURWO"],
+["PSY 8015","Inpatient Psychiatry (Clinical Elective)","4","ELEC FOURWO"],
+["PSY 8020","Child Psychiatry (Clinical Elective)","2","ELEC TWOWR"],
+["PSY 8025","Forensic Psychiatry (Non-Clinical Elective)","4","ELEC FOURWO"],
+["PSY 8030","Schizophrenia Precursors & Prodromal States (Clinical Elective)","2","ELEC TWOWR"],
+["PSY 8035","Interventional Psychiatry (Clinical Elective)","2","ELEC TWOWR"],
+["PSY 9100","Psychiatry Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["RADIOL 8005","General Radiology (Clinical Elective)","4","ELEC FOURWO"],
+["RADIOL 8015","Clinical Nuclear Medicine (Clinical Elective)","2","ELEC TWOWR"],
+["RADIOL 8030","Cardiothoracic Radiology (Clinical Elective)","4","ELEC FOURWO"],
+["RADIOL 9100","Diagnostic Radiology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["RADIOL 9150","Interventional Radiology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["RADONC 8005","Clinical Radiation Oncology (Clinical Elective)","2","ELEC TWOWO"],
+["RADONC 9100","Radiation Oncology Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["SURGERY 8000","General Surgery (Clinical Elective)","2","ELEC TWOWR"],
+["SURGERY 8010","Minimally Invasive Surgical Skills (Non-Clinical Elective)","2","ELEC TWOWO"],
+["SURGERY 8015","Cardiothoracic Surgery (Clinical Elective)","4","ELEC FOURWO"],
+["SURGERY 8020","Plastic & Reconstructive Surgery (Clinical Elective)","2","ELEC TWOWR"],
+["SURGERY 8030","Urologic Surgery (Clinical Elective)","2","ELEC TWOWR"],
+["SURGERY 8050","Vascular Surgery (Clinical Elective)","2","ELEC TWOWR"],
+["SURGERY 9100","General Surgery Advanced Clinical Rotation (ACR)","4","ACR FOURWR"],
+["SURGERY 9150","Cardiothoracic Surgery Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["SURGERY 9200","Plastic and Reconstructive Surgery Advanced Clinical Rotation (ACR)","4","ACR FOURWO"],
+["SURGERY 9250","Urologic Surgery Advanced Clinical Rotation (ACR)","4","ACR FOURWO"]
+]</script>
+
+<script id="p3-js">
+(() => {
+  const appEl = document.getElementById('app');
+
+  let RULES = JSON.parse(document.getElementById('p3-rules').textContent);
+  const DEFAULT_RULES = JSON.parse(JSON.stringify(RULES));
+  const CATALOG = JSON.parse(document.getElementById('p3-catalog').textContent).map(([code, title, units, attrs, pre]) => {
+    const at = attrs.split(' ').filter(Boolean);
+    const kind = /\(ACR\)/.test(title) ? 'ACR' : /\(KISC\)/.test(title) ? 'KISC' : /Longitudinal/.test(title) ? 'Longitudinal' : /Non-?\s?Clinical/.test(title) ? 'Non-clinical' : /Clinical Elective/.test(title) ? 'Clinical' : '';
+    const name = title.replace(/\s*\((Clinical Elective|Non-?\s?Clinical Elective|Longitudinal Elective|ACR|KISC)\)\s*$/, '').replace(/ Advanced Clinical Rotation$/, ' ACR');
+    const vr = String(units).match(/^(\d+)-(\d+)$/);
+    return { code, title, name, kind, attrs: at, units: vr ? null : +units, min: vr ? +vr[1] : null, max: vr ? +vr[2] : null, pre: pre || '', subj: code.split(' ')[0] };
+  });
+  const BY_CODE = Object.fromEntries(CATALOG.map(c => [c.code, c]));
+
+  const KEY = 'p3planner.v1';
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const uid = () => Math.random().toString(36).slice(2, 9);
+
+  let plan = load();
+  let ui = { modal: null, rulesFrom: 'built-in' };
+
+  function load() {
+    try { const p = JSON.parse(localStorage.getItem(KEY) || 'null'); if (p && Array.isArray(p.entries)) return Object.assign({ checks: {}, from: '', to: '', example: false }, p); } catch (e) {}
+    return { entries: [], checks: {}, from: '', to: '', example: false };
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(plan)); } catch (e) {} }
+
+  // ---------- Month helpers ----------
+  const ymAdd = (ym, n) => { let [y, m] = ym.split('-').map(Number); m += n; y += Math.floor((m - 1) / 12); m = ((m - 1) % 12 + 12) % 12 + 1; return y + '-' + String(m).padStart(2, '0'); };
+  const ymLabel = ym => { const [y, m] = ym.split('-').map(Number); return MONTHS[m - 1] + ' ' + y; };
+  const ymCmp = (a, b) => a < b ? -1 : a > b ? 1 : 0;
+  const range = () => {
+    const from = plan.from || RULES.calendar.start, to = plan.to || RULES.calendar.end;
+    const out = []; let ym = from; let guard = 0;
+    while (ymCmp(ym, to) <= 0 && guard++ < 48) { out.push(ym); ym = ymAdd(ym, 1); }
+    plan.entries.forEach(e => { if (e.ym && !out.includes(e.ym)) out.push(e.ym); });
+    return out.sort();
+  };
+
+  // ---------- Entry facts ----------
+  const typeOf = e => {
+    if (e.code === 'MEDPHASE3 8040') return 'cap';
+    if (e.attrs.includes('ACR')) return 'acr';
+    if (e.attrs.includes('KISC')) return 'kisc';
+    if (e.attrs.includes('ELEC')) return 'elec';
+    return 'oth';
+  };
+  const TYPE = { acr: ['ACR', '--t-acr'], kisc: ['KISC', '--t-kisc'], elec: ['Elective', '--t-elec'], cap: ['Capstone', '--t-cap'], oth: ['Other', '--t-oth'] };
+  const isLong = e => { const c = BY_CODE[e.code]; return c ? c.kind === 'Longitudinal' : !!e.longitudinal; };
+  const spanMonths = e => e.half === 'full' ? Math.max(1, Math.ceil(e.weeks / 4)) : 1;
+  const STATUS = { planned: 'Planned', registered: 'Registered', done: 'Completed' };
+
+  function matches(rule, e) {
+    if (rule.away === 'away' && !e.away) return false;
+    if (rule.away === 'home' && e.away) return false;
+    if (rule.all) return true;
+    if ((rule.codes || []).includes(e.code)) return true;
+    return (rule.tags || []).some(t => e.attrs.includes(t));
+  }
+
+  function evaluate() {
+    const rules = RULES.rules.map(r => {
+      const s = { done: 0, registered: 0, planned: 0 };
+      plan.entries.forEach(e => { if (matches(r, e)) s[e.status] += e.weeks; });
+      const sum = s.done + s.registered + s.planned;
+      let state;
+      if (r.kind === 'max') state = sum > r.weeks ? 'over' : 'ok';
+      else state = s.done >= r.weeks ? 'done' : s.done + s.registered >= r.weeks ? 'reg' : sum >= r.weeks ? 'planned' : 'short';
+      return { r, s, sum, state };
+    });
+    const warns = [];
+    rules.forEach(x => { if (x.r.kind === 'max' && x.state === 'over') warns.push({ bad: true, t: `<b>${esc(x.r.label)}:</b> ${x.sum} weeks planned, the limit is ${x.r.weeks}.` }); });
+    // Overlaps (longitudinal electives run alongside other courses, so they are skipped).
+    const occ = {};
+    plan.entries.filter(e => !isLong(e)).forEach(e => {
+      for (let i = 0; i < spanMonths(e); i++) {
+        const ym = ymAdd(e.ym, i);
+        (e.half === 'full' ? ['ab', 'cd'] : [e.half]).forEach(h => { (occ[ym + '|' + h] = occ[ym + '|' + h] || []).push(e); });
+      }
+    });
+    const conflict = new Set(); const seenPair = new Set();
+    Object.entries(occ).forEach(([k, list]) => {
+      if (list.length < 2) return;
+      list.forEach(e => conflict.add(e.id));
+      const key = list.map(e => e.id).sort().join('+');
+      if (seenPair.has(key)) return; seenPair.add(key);
+      const [ym, h] = k.split('|');
+      warns.push({ bad: true, t: `<b>Overlap in ${ymLabel(ym)}${h === 'ab' ? ', weeks 1–2' : ', weeks 3–4'}:</b> ${list.map(e => esc(e.name)).join(' and ')}.` });
+    });
+    // Prerequisites.
+    plan.entries.forEach(e => {
+      const c = BY_CODE[e.code]; if (!c || !c.pre) return;
+      const pre = plan.entries.filter(p => p.code === c.pre);
+      const preName = BY_CODE[c.pre] ? BY_CODE[c.pre].name : c.pre;
+      if (!pre.length) warns.push({ t: `<b>${esc(e.name)}</b> requires ${esc(preName)} first (bulletin). It isn't in your plan yet.` });
+      else if (!pre.some(p => ymCmp(p.ym, e.ym) < 0 || (p.ym === e.ym && p.half === 'ab' && e.half === 'cd'))) warns.push({ t: `<b>${esc(e.name)}</b> requires ${esc(preName)} first. Your plan has it at the same time or later.` });
+    });
+    // Same course twice when the bulletin lists it as a fixed-length course.
+    const byCode = {};
+    plan.entries.forEach(e => { if (BY_CODE[e.code]) (byCode[e.code] = byCode[e.code] || []).push(e); });
+    Object.values(byCode).forEach(list => {
+      const c = BY_CODE[list[0].code];
+      if (list.length > 1 && (c.attrs.includes('TWOWO') || c.attrs.includes('FOURWO'))) warns.push({ t: `<b>${esc(c.name)}</b> is in your plan ${list.length} times. The bulletin lists it as a ${c.attrs.includes('TWOWO') ? '2' : '4'}-week-only course, not a repeatable one. Check that it can count twice.` });
+    });
+    const outside = plan.entries.filter(e => ymCmp(e.ym, RULES.calendar.start) < 0 || ymCmp(e.ym, RULES.calendar.end) > 0);
+    if (outside.length) warns.push({ t: `<b>${outside.length} rotation${outside.length > 1 ? 's are' : ' is'} outside ${ymLabel(RULES.calendar.start)}–${ymLabel(RULES.calendar.end)},</b> the Phase 3 window set in the rules.` });
+    return { rules, warns, conflict };
+  }
+
+  // ---------- Render ----------
+  function bar(s, need) {
+    const tot = Math.max(need, s.done + s.registered + s.planned) || 1;
+    const w = v => (v / tot * 100).toFixed(2) + '%';
+    return `<div class="bar" role="img" aria-label="${s.done} completed, ${s.registered} registered, ${s.planned} planned of ${need} weeks"><i class="d" style="width:${w(s.done)}"></i><i class="r" style="width:${w(s.registered)}"></i><i class="p" style="width:${w(s.planned)}"></i></div>`;
+  }
+  const pill = x => {
+    if (x.r.kind === 'max') return x.state === 'over' ? '<span class="pill over">Over limit</span>' : '<span class="pill ok">Within limit</span>';
+    return { done: '<span class="pill ok">Completed</span>', reg: '<span class="pill reg">Registered</span>', planned: '<span class="pill short">Planned</span>', short: `<span class="pill short">${Math.max(0, x.r.weeks - x.sum)} wk to go</span>` }[x.state];
+  };
+
+  function render() {
+    const ev = evaluate();
+    const total = ev.rules.find(x => x.r.all && x.r.kind === 'min');
+    const mins = ev.rules.filter(x => x.r.kind === 'min' && x !== total);
+    const maxes = ev.rules.filter(x => x.r.kind === 'max');
+    const reviewed = RULES.reviewed ? new Date(RULES.reviewed + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    const months = range();
+
+    let h = `<header class="head"><div><h1>Phase 3 Planner</h1>
+      <p class="meta">Plan your post-clerkship rotations against the graduation requirements. Rules from the ${esc(RULES.source)}${reviewed ? ', last reviewed ' + esc(reviewed) : ''}. Your plan stays in this browser.</p></div>
+      <div class="row"><button class="btn primary" data-act="add">Add rotation</button></div></header>`;
+
+    if (plan.example) h += `<div class="banner"><span><b>This is an example plan</b> to show how the planner works. It isn't anyone's real schedule.</span><button class="btn" data-act="clear-example">Clear it and start my own</button></div>`;
+    else if (!plan.entries.length) h += `<div class="banner"><span>Start by adding the rotations you've done or registered for, then plan the rest.</span><button class="btn" data-act="example">Show an example plan</button></div>`;
+
+    // Summary
+    h += `<section class="section" aria-labelledby="sum-h"><div class="section-head"><h2 id="sum-h">Graduation requirements</h2>
+      <div class="legend"><span style="--c:var(--done)">Completed</span><span style="--c:var(--reg)">Registered</span><span style="--c:var(--plan)">Planned</span></div></div>`;
+    if (total) {
+      const t = total.s, sum = t.done + t.registered + t.planned;
+      h += `<div class="panel total"><div class="big">${sum}<small> / ${total.r.weeks} weeks</small></div>
+        <div style="display:flex;flex-direction:column;gap:6px;min-width:0">${bar(t, total.r.weeks)}
+        <p class="small muted">${t.done} completed · ${t.registered} registered · ${t.planned} planned · ${Math.max(0, total.r.weeks - sum)} still to plan</p></div></div>`;
+    }
+    if (ev.warns.length) h += `<div class="warns">${ev.warns.map(w => `<div class="warn${w.bad ? ' bad' : ''}">${w.t}</div>`).join('')}</div>`;
+    h += `<div class="reqs">${mins.map(x => `<div class="req"><div class="top"><h3>${esc(x.r.label)}</h3>${pill(x)}</div>${bar(x.s, x.r.weeks)}
+      <div class="top"><span class="sub">${x.s.done} done · ${x.s.registered} reg · ${x.s.planned} planned</span><span class="num">${x.sum} / ${x.r.weeks} wk</span></div>
+      ${x.r.note ? `<p class="sub">${esc(x.r.note)}</p>` : ''}</div>`).join('')}</div>`;
+    if (maxes.length) h += `<div class="reqs">${maxes.map(x => `<div class="req"><div class="top"><h3>${esc(x.r.label)}</h3>${pill(x)}</div>
+      <div class="top"><span class="sub">Limit ${x.r.weeks} weeks</span><span class="num">${x.sum} / ${x.r.weeks} wk</span></div>${x.r.note ? `<p class="sub">${esc(x.r.note)}</p>` : ''}</div>`).join('')}</div>`;
+    h += `</section>`;
+
+    // Calendar
+    h += `<section class="section" aria-labelledby="cal-h"><div class="section-head"><h2 id="cal-h">Your schedule</h2>
+      <div class="row small"><label class="muted" for="from">Show</label><input type="month" id="from" value="${esc(months[0] || '')}" class="btn ghost" style="font-weight:400">
+      <label class="muted" for="to">to</label><input type="month" id="to" value="${esc(months[months.length - 1] || '')}" class="btn ghost" style="font-weight:400"></div></div>
+      <div class="cal"><div class="cal-head"><span>Month</span><span>Weeks 1–2</span><span>Weeks 3–4</span></div>`;
+    const cont = {};
+    plan.entries.forEach(e => { for (let i = 1; i < spanMonths(e); i++) (cont[ymAdd(e.ym, i)] = cont[ymAdd(e.ym, i)] || []).push(e); });
+    months.forEach(ym => {
+      const list = plan.entries.filter(e => e.ym === ym && !isLong(e)).concat(cont[ym] || []);
+      const full = list.filter(e => e.half === 'full'), ab = list.filter(e => e.half === 'ab'), cd = list.filter(e => e.half === 'cd');
+      const abFree = !full.length && !ab.length, cdFree = !full.length && !cd.length;
+      const [y, m] = ym.split('-');
+      h += `<div class="mrow"><div class="mlab">${MONTHS[+m - 1]}<small>${y}</small></div>`;
+      full.forEach(e => h += `<div class="slot s-full">${chip(e, ev.conflict, e.ym !== ym)}</div>`);
+      ab.forEach(e => h += `<div class="slot s-ab">${chip(e, ev.conflict)}</div>`);
+      cd.forEach(e => h += `<div class="slot s-cd">${chip(e, ev.conflict)}</div>`);
+      if (abFree) h += `<div class="slot s-ab"><button class="add" data-act="add" data-ym="${ym}" data-half="ab">+ Add weeks 1–2</button></div>`;
+      if (cdFree) h += `<div class="slot s-cd"><button class="add" data-act="add" data-ym="${ym}" data-half="cd">+ Add weeks 3–4</button></div>`;
+      h += `</div>`;
+    });
+    const longs = plan.entries.filter(isLong);
+    if (longs.length) h += `<div class="longrow"><span class="small muted">Longitudinal, alongside other courses:</span>${longs.map(e => chip(e, new Set())).join('')}</div>`;
+    h += `</div></section>`;
+
+    // Checklist
+    if (RULES.checklist.length || RULES.deadlines.length) {
+      h += `<section class="section" aria-labelledby="chk-h"><h2 id="chk-h">Other things to finish</h2><div class="panel checks">`;
+      RULES.checklist.forEach((c, i) => { const id = 'chk-' + i; h += `<label for="${id}"><input type="checkbox" id="${id}" data-chk="${esc(c)}" ${plan.checks[c] ? 'checked' : ''}><span>${esc(c)}</span></label>`; });
+      if (RULES.deadlines.length) h += `<div><p class="flabel" style="margin:6px 0">Dates</p>${RULES.deadlines.slice().sort((a, b) => ymCmp(a.date, b.date)).map(d => `<p class="small"><span class="mono">${esc(d.date)}</span> · ${esc(d.label)}</p>`).join('')}</div>`;
+      h += `</div></section>`;
+    }
+
+    // Rules
+    h += `<section class="section" aria-labelledby="rules-h"><div class="section-head"><h2 id="rules-h">How your plan is checked</h2>
+</div>`;
+    h += rulesView();
+    h += `</section>`;
+
+    // Footer
+    h += `<footer class="foot">
+      <p>Course list and requirements come from the public Washington University Bulletin. Workday and Keystone are the official record; check anything that matters with the Office of Medical Student Education. Student-built and unofficial.</p>
+      <p>Your plan is saved only in this browser. Copy a backup code to move it to another device.</p>
+      <div class="row"><button class="btn" data-act="backup">Copy backup code</button><button class="btn" data-act="restore">Restore from a code</button>${plan.entries.length ? '<button class="btn ghost danger" data-act="wipe">Clear my plan</button>' : ''}</div>
+    </footer>`;
+
+    appEl.innerHTML = h;
+    if (ui.modal) renderModal();
+  }
+
+  function chip(e, conflict, continued) {
+    const [lab, col] = TYPE[typeOf(e)];
+    const when = isLong(e) ? 'Longitudinal' : e.half === 'full' ? (e.weeks > 4 ? `${e.weeks} weeks` : 'Full block') : e.half === 'ab' ? 'Weeks 1–2' : 'Weeks 3–4';
+    return `<button class="chip st-${e.status}${conflict.has(e.id) ? ' conflict' : ''}" style="--tc:var(${col})" data-act="edit" data-id="${e.id}">
+      <span class="ct">${continued ? '↳ ' : ''}${esc(e.name)}</span>
+      <span class="cm"><span class="typetag">${lab}</span><span>${when}</span><span>${STATUS[e.status]}</span>${e.away ? '<span>Away</span>' : ''}</span></button>`;
+  }
+
+  function ruleLine(r) {
+    const what = r.all ? 'Every rotation' : [...(r.tags || []).map(t => ({ ACR: 'ACRs', KISC: 'KISCs', ELEC: 'electives' }[t] || t)), ...(r.codes || []).map(c => (BY_CODE[c] ? BY_CODE[c].name : c) + ' (' + c + ')')].join(', ') || 'Nothing selected';
+    const where = r.away === 'away' ? ', away only' : r.away === 'home' ? ', at WashU only' : '';
+    return `${what}${where}`;
+  }
+  function rulesView() {
+    let h = `<div class="panel"><div class="rules-list">${RULES.rules.map(r => `<div class="rl"><span>${esc(r.label)}</span><span class="rv">${r.kind === 'max' ? 'At most' : 'At least'} ${r.weeks} wk</span><span class="rd">Counts: ${esc(ruleLine(r))}${r.note ? ' · ' + esc(r.note) : ''}</span></div>`).join('')}</div></div>`;
+    if (RULES.notes.length) h += `<div class="notes">${RULES.notes.map(n => `<p class="muted">${esc(n)}</p>`).join('')}</div>`;
+    return h;
+  }
+
+  // ---------- Add / edit modal ----------
+  function openModal(entry, preset) {
+    ui.modal = entry ? { id: entry.id, draft: Object.assign({}, entry), q: '' } : { id: null, draft: { ym: (preset && preset.ym) || '', half: (preset && preset.half) || '', status: 'planned', away: false }, q: '' };
+    renderModal();
+    setTimeout(() => { const f = document.getElementById(entry ? 'm-status' : 'm-q'); if (f) f.focus(); }, 0);
+  }
+  function closeModal() { ui.modal = null; const s = document.querySelector('.scrim'); if (s) s.remove(); }
+
+  function renderModal() {
+    let s = document.querySelector('.scrim');
+    if (!s) { s = document.createElement('div'); s.className = 'scrim'; document.body.appendChild(s); s.addEventListener('click', ev => { if (ev.target === s) closeModal(); }); }
+    const M = ui.modal, d = M.draft, c = d.code ? BY_CODE[d.code] : null;
+    const months = range();
+    let h = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-h"><div class="section-head"><h2 id="m-h">${M.id ? 'Edit rotation' : 'Add a rotation'}</h2><button class="btn ghost" data-act="m-close" aria-label="Close">Close</button></div>`;
+    if (!d.code && !d.custom) {
+      const q = M.q.trim().toLowerCase();
+      const res = CATALOG.filter(x => !q || (x.code + ' ' + x.title).toLowerCase().includes(q)).slice(0, 60);
+      h += `<div class="field"><label for="m-q">Find a course</label><input id="m-q" type="search" autocomplete="off" placeholder="Name, department or code, e.g. MICU, KISC, EMED" value="${esc(M.q)}"></div>
+        <div class="results" id="m-res">${res.map(x => { const [lab, col] = TYPE[typeOf({ code: x.code, attrs: x.attrs })]; return `<button class="res" style="--tc:var(${col})" data-act="pick" data-code="${esc(x.code)}"><span class="rt">${esc(x.name)}</span><span class="rc">${esc(x.code)}${x.kind && x.kind !== lab ? ' · ' + esc(x.kind) : ''}</span><span class="rw">${lab} · ${x.units ? x.units + ' wk' : x.min + '–' + x.max + ' wk'}</span></button>`; }).join('') || '<p class="small muted" style="padding:10px">No matches in the bulletin catalog.</p>'}</div>
+        <p class="small muted">Not listed? <button class="btn ghost" data-act="custom">Add it by hand</button></p>`;
+    } else {
+      const [lab, col] = TYPE[typeOf({ code: d.code, attrs: d.attrs || (c ? c.attrs : []) })];
+      if (c) h += `<div class="chosen" style="--tc:var(${col})"><div><div style="font-weight:600">${esc(c.name)}</div><div class="small muted">${esc(c.code)} · ${lab}${c.units ? ' · ' + c.units + ' weeks' : ''}</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
+      else h += `<div class="grid2"><div class="field" style="grid-column:1 / -1"><label for="m-name">Rotation name</label><input id="m-name" value="${esc(d.name || '')}" placeholder="e.g. Away sub-I, Cardiology at another school"></div>
+        <div class="field"><label for="m-type">Counts as</label><select id="m-type">${[['ELEC', 'Elective'], ['ACR', 'ACR'], ['KISC', 'KISC'], ['', 'Other']].map(([v, l]) => `<option value="${v}" ${(d.attrs || ['ELEC'])[0] === v || (!v && !(d.attrs || ['ELEC']).length) ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="field"><label for="m-code">Course code (optional)</label><input id="m-code" value="${esc(d.code || '')}" placeholder="e.g. MEDPHASE3 9998"></div></div>`;
+      const fixed = c && c.units && !(c.kind === 'Longitudinal');
+      const weeksOpts = fixed ? null : (c ? [c.min || 1, c.max || 4] : [1, 12]);
+      h += `<div class="grid2"><div class="field"><label for="m-ym">Month</label><select id="m-ym"><option value="">Choose…</option>${months.map(ym => `<option value="${ym}" ${d.ym === ym ? 'selected' : ''}>${ymLabel(ym)}</option>`).join('')}</select></div>`;
+      if (!fixed) h += `<div class="field"><label for="m-weeks">Weeks</label><input id="m-weeks" type="number" min="${weeksOpts[0]}" max="${weeksOpts[1]}" value="${d.weeks || (c && c.kind === 'Longitudinal' ? c.units : 4)}"></div>`;
+      h += `<div class="field"><label for="m-status">Status</label><select id="m-status">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}" ${d.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`;
+      const twoWeek = fixed ? c.units === 2 : (d.weeks || 4) <= 2;
+      if (!(c && c.kind === 'Longitudinal')) h += `<div class="field"><span class="flabel">Which weeks</span><div class="seg" role="group" aria-label="Which weeks">${twoWeek ? `<button data-act="half" data-half="ab" aria-pressed="${d.half === 'ab'}">Weeks 1–2</button><button data-act="half" data-half="cd" aria-pressed="${d.half === 'cd'}">Weeks 3–4</button>` : `<button aria-pressed="true" disabled>Starts week 1 of the month</button>`}</div></div>`;
+      const autoAway = d.code === 'MEDPHASE3 9998' || d.code === 'MEDPHASE3 9999';
+      h += `<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="m-away" ${d.away || autoAway ? 'checked' : ''} ${autoAway ? 'disabled' : ''}> Away rotation (not at WashU)</label>`;
+      h += `<p class="small" id="m-err" role="alert" style="color:var(--bad)"></p>
+        <div class="row"><button class="btn primary" data-act="m-save">${M.id ? 'Save changes' : 'Add to plan'}</button>${M.id ? '<button class="btn ghost danger" data-act="m-del">Remove</button>' : ''}</div>`;
+    }
+    h += `</div>`;
+    s.innerHTML = h;
+    const q = document.getElementById('m-q');
+    if (q) q.addEventListener('input', () => { ui.modal.q = q.value; const pos = q.selectionStart; renderModal(); const nq = document.getElementById('m-q'); nq.focus(); try { nq.setSelectionRange(pos, pos); } catch (e) {} });
+    const w = document.getElementById('m-weeks');
+    if (w) w.addEventListener('change', () => { syncDraft(); if ((ui.modal.draft.weeks || 4) > 2) ui.modal.draft.half = 'full'; renderModal(); });
+  }
+  function syncDraft() {
+    const d = ui.modal.draft; const g = id => document.getElementById(id);
+    if (g('m-ym')) d.ym = g('m-ym').value;
+    if (g('m-status')) d.status = g('m-status').value;
+    if (g('m-weeks')) d.weeks = Math.max(1, parseInt(g('m-weeks').value, 10) || 1);
+    if (g('m-away') && !g('m-away').disabled) d.away = g('m-away').checked;
+    if (g('m-name')) d.name = g('m-name').value.trim();
+    if (g('m-type')) d.attrs = g('m-type').value ? [g('m-type').value] : [];
+    if (g('m-code')) d.code = g('m-code').value.trim().toUpperCase().replace(/\s+/g, ' ');
+  }
+  function saveModal() {
+    syncDraft();
+    const d = ui.modal.draft, c = d.code && !d.custom ? BY_CODE[d.code] : null, err = document.getElementById('m-err');
+    const e = { id: ui.modal.id || uid(), status: d.status || 'planned', ym: d.ym, away: !!d.away };
+    if (c) {
+      Object.assign(e, { code: c.code, name: c.name, attrs: c.attrs.slice() });
+      if (c.kind === 'Longitudinal') { e.weeks = c.units; e.half = 'full'; }
+      else if (c.units) { e.weeks = c.units; e.half = c.units === 2 ? d.half : 'full'; }
+      else { e.weeks = Math.min(c.max, Math.max(c.min, d.weeks || 4)); e.half = e.weeks <= 2 ? d.half : 'full'; }
+      if (c.code === 'MEDPHASE3 9998' || c.code === 'MEDPHASE3 9999') e.away = true;
+    } else {
+      if (!d.name) { err.textContent = 'Give the rotation a name.'; return; }
+      Object.assign(e, { code: d.code || '', name: d.name, attrs: d.attrs || ['ELEC'], custom: true, weeks: Math.min(52, Math.max(1, d.weeks || 4)) });
+      e.half = e.weeks <= 2 ? d.half : 'full';
+    }
+    if (!e.ym) { err.textContent = 'Choose a month.'; return; }
+    if (e.half !== 'full' && e.half !== 'ab' && e.half !== 'cd') { err.textContent = 'Choose weeks 1–2 or weeks 3–4.'; return; }
+    if (plan.example) { plan.example = false; }
+    const i = plan.entries.findIndex(x => x.id === e.id);
+    if (i >= 0) plan.entries[i] = e; else plan.entries.push(e);
+    save(); closeModal(); render(); toast(i >= 0 ? 'Saved' : 'Added to your plan');
+  }
+
+  // ---------- Example plan ----------
+  function examplePlan() {
+    const s = RULES.calendar.start; const at = n => ymAdd(s, n);
+    const mk = (code, n, half, status) => { const c = BY_CODE[code]; return { id: uid(), code, name: c.name, attrs: c.attrs.slice(), weeks: c.units || 4, half, ym: at(n), status, away: false }; };
+    return [
+      mk('MEDICINE 9150', 0, 'full', 'done'), mk('MEDPHASE3 7040', 1, 'full', 'done'),
+      mk('MEDICINE 8030', 2, 'ab', 'done'), mk('MEDICINE 8160', 2, 'cd', 'done'),
+      mk('MEDICINE 9100', 4, 'full', 'registered'), mk('EMED 8021', 5, 'full', 'registered'),
+      mk('MEDPHASE3 7070', 6, 'ab', 'registered'), mk('MEDICINE 8135', 6, 'cd', 'planned'),
+      Object.assign(mk('MEDPHASE3 9998', 7, 'full', 'planned'), { away: true, weeks: 4 }),
+      mk('PSY 8005', 9, 'full', 'planned'), mk('MEDPHASE3 8040', 14, 'full', 'planned')
+    ];
+  }
+
+
+  // ---------- Requirements from the Google Sheet ----------
+  // /api/rules returns each sheet tab as CSV rows. Every row is checked; a row that can't be read
+  // keeps its last good version (by ID), and a tab that can't be read keeps the whole last good tab.
+  const RKEY = 'p3planner.rules.v1';
+  const norm = v => String(v == null ? '' : v).trim();
+  const lc = v => norm(v).toLowerCase();
+  const HEAD = {
+    requirements: ['id', 'requirement', 'type', 'weeks', 'counts', 'course codes', 'where'],
+    settings: ['setting', 'value'], checklist: ['item'], dates: ['date', 'what'], notes: ['note']
+  };
+  const headerOk = (rows, want) => rows && rows.length && want.every((h, i) => lc(rows[0][i]) === h);
+  const TAGS = { 'acrs': 'ACR', 'acr': 'ACR', 'kiscs': 'KISC', 'kisc': 'KISC', 'electives': 'ELEC', 'elective': 'ELEC' };
+  const WHERE = { 'anywhere': 'any', '': 'any', 'at washu only': 'home', 'away only': 'away' };
+  function ymd(v) {
+    v = norm(v); let m;
+    if ((m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/))) return v;
+    if ((m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/))) return `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`;
+    return '';
+  }
+  function ym(v) {
+    v = norm(v); let m;
+    if (/^\d{4}-\d{2}$/.test(v)) return v;
+    if ((m = v.match(/^(\d{4})-(\d{2})-\d{2}$/))) return m[1] + '-' + m[2];
+    if ((m = v.match(/^(\d{1,2})\/\d{1,2}\/(\d{4})$/))) return m[2] + '-' + m[1].padStart(2, '0');
+    return '';
+  }
+  function parseRule(r) {
+    const id = norm(r[0]), label = norm(r[1]), type = lc(r[2]), weeks = norm(r[3]);
+    if (!id || !label || !/^\d+$/.test(weeks) || (type !== 'at least' && type !== 'at most')) return null;
+    const where = WHERE[lc(r[6])]; if (!where) return null;
+    let all = false; const tags = [];
+    for (const t of norm(r[4]).split(',').map(lc).filter(Boolean)) {
+      if (t === 'every rotation') all = true; else if (TAGS[t]) tags.push(TAGS[t]); else return null;
+    }
+    const codes = norm(r[5]).split(',').map(c => c.trim().toUpperCase().replace(/\s+/g, ' ')).filter(Boolean);
+    if (codes.some(c => !/^[A-Z0-9]+ \d{4}$/.test(c))) return null;
+    if (!all && !tags.length && !codes.length) return null;
+    return { id, label, kind: type === 'at least' ? 'min' : 'max', weeks: +weeks, all, tags, codes, away: where, note: norm(r[7]) };
+  }
+  function applySheet(tabs, prev) {
+    const next = JSON.parse(JSON.stringify(prev));
+    const t = k => tabs[k] && tabs[k].ok && headerOk(tabs[k].rows, HEAD[k]) ? tabs[k].rows.slice(1) : null;
+    const req = t('requirements');
+    if (req) {
+      const byId = Object.fromEntries(prev.rules.map(r => [r.id, r]));
+      const seen = new Set(); const list = [];
+      req.forEach(row => {
+        if (row.every(c => !norm(c))) return;
+        const id = norm(row[0]); if (!id || seen.has(id)) return; seen.add(id);
+        const r = parseRule(row) || byId[id]; if (r) list.push(r);
+      });
+      if (list.length) next.rules = list;
+    }
+    const set = t('settings');
+    if (set) {
+      const m = Object.fromEntries(set.map(r => [lc(r[0]), norm(r[1])]));
+      if (m['source']) next.source = m['source'];
+      if (ymd(m['last reviewed'])) next.reviewed = ymd(m['last reviewed']);
+      const a = ym(m['phase 3 starts']), b = ym(m['phase 3 ends']);
+      if (a && b && a <= b) next.calendar = { start: a, end: b };
+    }
+    const chk = t('checklist'); if (chk) next.checklist = chk.map(r => norm(r[0])).filter(Boolean);
+    const dl = t('dates'); if (dl) next.deadlines = dl.map(r => ({ date: ymd(r[0]), label: norm(r[1]) })).filter(d => d.date && d.label);
+    const nt = t('notes'); if (nt) next.notes = nt.map(r => norm(r[0])).filter(Boolean);
+    return next;
+  }
+  async function loadSheetRules() {
+    try { const saved = JSON.parse(localStorage.getItem(RKEY) || 'null'); if (saved && Array.isArray(saved.rules) && saved.rules.length) { RULES = saved; render(); } } catch (e) {}
+    try {
+      const r = await fetch('api/rules', { cache: 'no-store' }); if (!r.ok) return;
+      const data = await r.json(); if (!data || !data.tabs) return;
+      const next = applySheet(data.tabs, RULES);
+      if (JSON.stringify(next) !== JSON.stringify(RULES)) {
+        RULES = next; try { localStorage.setItem(RKEY, JSON.stringify(next)); } catch (e) {}
+        if (!ui.modal) render();
+      }
+    } catch (e) {}
+  }
+  window.__p3 = { applySheet, parseRule, DEFAULT_RULES };
+
+  // ---------- Events ----------
+  let toastT;
+  function toast(t) { let el = document.querySelector('.toast'); if (!el) { el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); } el.textContent = t; clearTimeout(toastT); toastT = setTimeout(() => el.remove(), 2200); }
+
+  document.addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-act]'); if (!b) return;
+    const a = b.dataset.act;
+    if (a === 'add') openModal(null, { ym: b.dataset.ym, half: b.dataset.half });
+    else if (a === 'edit') { const e = plan.entries.find(x => x.id === b.dataset.id); if (e) openModal(e); }
+    else if (a === 'm-close') closeModal();
+    else if (a === 'pick') { const c = BY_CODE[b.dataset.code]; const wk = c.units || Math.min(c.max, 4); Object.assign(ui.modal.draft, { code: c.code, custom: false, weeks: wk, half: wk <= 2 ? (ui.modal.draft.half === 'cd' ? 'cd' : ui.modal.draft.half === 'ab' ? 'ab' : '') : 'full' }); renderModal(); }
+    else if (a === 'unpick') { ui.modal.draft.code = ''; renderModal(); }
+    else if (a === 'custom') { Object.assign(ui.modal.draft, { custom: true, code: '', attrs: ['ELEC'], weeks: 4, half: 'full' }); renderModal(); }
+    else if (a === 'half') { syncDraft(); ui.modal.draft.half = b.dataset.half; renderModal(); }
+    else if (a === 'm-save') saveModal();
+    else if (a === 'm-del') { plan.entries = plan.entries.filter(x => x.id !== ui.modal.id); save(); closeModal(); render(); toast('Removed'); }
+    else if (a === 'example') { plan.entries = examplePlan(); plan.example = true; save(); render(); }
+    else if (a === 'clear-example') { plan.entries = []; plan.example = false; save(); render(); }
+    else if (a === 'wipe') { if (b.dataset.confirm) { plan.entries = []; plan.checks = {}; plan.example = false; save(); render(); toast('Plan cleared'); } else { b.dataset.confirm = '1'; b.textContent = 'Tap again to clear everything'; } }
+    else if (a === 'backup') {
+      const code = 'P3P1.' + btoa(unescape(encodeURIComponent(JSON.stringify(plan))));
+      try { await navigator.clipboard.writeText(code); toast('Backup code copied'); }
+      catch (e) { showCodeBox(code, true); }
+    }
+    else if (a === 'restore') showCodeBox('', false);
+    else if (a === 'do-restore') {
+      const t = (document.getElementById('code-box').value || '').trim();
+      try { const p = JSON.parse(decodeURIComponent(escape(atob(t.replace(/^P3P1\./, ''))))); if (!Array.isArray(p.entries)) throw 0; plan = Object.assign({ checks: {}, from: '', to: '', example: false }, p); save(); render(); toast('Plan restored'); }
+      catch (e) { document.getElementById('code-err').textContent = "That code didn't work. Copy the whole code and try again."; }
+    }
+  });
+  document.addEventListener('change', ev => {
+    const t = ev.target;
+    if (t.dataset && t.dataset.chk) { plan.checks[t.dataset.chk] = t.checked; save(); }
+    else if (t.id === 'from' || t.id === 'to') { if (t.value) { plan[t.id] = t.value; if (plan.from && plan.to && plan.from > plan.to) [plan.from, plan.to] = [plan.to, plan.from]; save(); render(); } }
+  });
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && ui.modal) closeModal(); if (ev.key === 'Enter' && ev.target.id === 'm-q') { const f = document.querySelector('#m-res .res'); if (f) { ev.preventDefault(); f.click(); } } });
+
+  function showCodeBox(code, isCopy) {
+    ui.modal = null;
+    let s = document.querySelector('.scrim'); if (!s) { s = document.createElement('div'); s.className = 'scrim'; document.body.appendChild(s); s.addEventListener('click', ev => { if (ev.target === s) s.remove(); }); }
+    s.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="cb-h"><div class="section-head"><h2 id="cb-h">${isCopy ? 'Your backup code' : 'Restore a plan'}</h2><button class="btn ghost" data-act="m-close">Close</button></div>
+      <p class="small muted">${isCopy ? 'Copying was blocked here, so the code is selected below. Copy it (⌘C or Ctrl+C) and keep it somewhere safe.' : 'Paste a backup code. It replaces the plan in this browser.'}</p>
+      <textarea id="code-box" class="code" ${isCopy ? 'readonly' : ''}>${esc(code)}</textarea><p class="small" id="code-err" style="color:var(--bad)"></p>
+      ${isCopy ? '' : '<div class="row"><button class="btn primary" data-act="do-restore">Restore</button></div>'}</div>`;
+    const box = document.getElementById('code-box'); box.focus(); if (isCopy) box.select();
+  }
+
+  render();
+  loadSheetRules();
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+})();
+</script>
+</body>
+</html>
