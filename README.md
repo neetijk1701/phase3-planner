@@ -1,13 +1,15 @@
 # Phase 3 Planner
 
-A student-built planner for WashU Medicine Phase 3. Students add the rotations they've done, registered for, or plan to take, and the site checks the plan against the graduation requirements: total weeks, ACRs, KISCs, electives, the Capstone, and limits such as Step study and away electives. It also flags overlapping rotations, a missing prerequisite (the Neurosurgery ACR needs the Neurosurgery elective first), and a fixed-length course planned twice.
+A student-built planner for WashU Medicine Phase 3. Students add the rotations they've done, registered for, or plan to take, and the site checks the plan against the graduation requirements: ACRs, KISCs, electives, the Capstone, and limits such as Step 2 study and away electives.
+
+The core check is the **cushion**. Phase 3 is a fixed window (64 weeks by default) and 56 of those weeks must be credit. Flex, vacation, remediation, Phase 2 make-up and weeks over a limit take up time without earning credit, so they use up the cushion. The site shows cushion left (open weeks minus credit weeks still needed), warns at zero, and shows how many weeks short a plan is. The add dialog previews the effect before a rotation is saved. Rotations marked "alongside" (longitudinal electives, a course over a break) earn credit without taking a block. It also flags overlapping rotations, a missing prerequisite (the Neurosurgery ACR needs the Neurosurgery elective first), and a fixed-length course planned twice.
 
 Not an official WashU service. Workday and Keystone are the official record.
 
 ## Where things live
 
 - **Students' plans** are saved only in their own browser (`localStorage`). Nothing about a student is sent anywhere. A backup code moves a plan to another device.
-- **Requirements** live in the Google Sheet "Phase 3 Planner requirements" (ID in `wrangler.jsonc`), which must be shared as "Anyone with the link: Viewer". Tabs: How to edit, Settings, Requirements, Checklist, Dates, Notes. Edits reach the site within a few minutes.
+- **Requirements** (Phase 3 length, credit weeks required, and each requirement or limit) live in the Google Sheet "Phase 3 Planner requirements" (ID in `wrangler.jsonc`), which must be shared as "Anyone with the link: Viewer". Tabs: How to edit, Settings, Requirements, Checklist, Dates, Notes. Edits reach the site within a few minutes.
 - **Course list** is built into `public/index.html` (the `p3-catalog` block): every Phase 3 course in the public Washington University Bulletin 2026–27, with its weeks and type (`ACR`, `KISC`, `ELEC`, `TWOWO` 2-week only, `TWOWR` 2-week repeatable, `FOURWO` 4-week only, `FOURWR` 4-week repeatable). Update it when the bulletin changes.
 
 ## How the requirements are read

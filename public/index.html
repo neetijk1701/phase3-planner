@@ -22,19 +22,19 @@ body{margin:0}
   --bg:#f8f7f5; --surface:#ffffff; --sunk:#f1eeeb; --ink:#1e1a19; --muted:#6b6361; --line:#e4dedb;
   --accent:#a51417; --accent-soft:#f6e3e3; --on-accent:#ffffff;
   --done:#2c6e49; --reg:#3a6ea5; --plan:#b9b0ad; --warn:#9a5b00; --warn-bg:#fff4e0; --bad:#b3261e; --bad-bg:#fdecea;
-  --t-acr:#7a1f5c; --t-kisc:#2f5d8a; --t-elec:#4a6b2f; --t-cap:#8a5a00; --t-oth:#5e5653; --t-flex:#0f766e; --t-p2:#5b5f97;
+  --t-acr:#7a1f5c; --t-kisc:#2f5d8a; --t-elec:#4a6b2f; --t-cap:#8a5a00; --t-oth:#5e5653; --t-flex:#0f766e; --t-p2:#5b5f97; --t-rem:#9b3d3d; --zero:#8a5a00; --zero-bg:#fff4e0;
   --display:"Fraunces",Georgia,serif; --body:"Source Sans 3",-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#161312; --surface:#201c1b; --sunk:#2a2523; --ink:#f1ebe8; --muted:#a99e9b; --line:#3a3331;
   --accent:#e2575b; --accent-soft:#3a1f20; --on-accent:#1a0c0c;
   --done:#5fbf86; --reg:#7aa9dc; --plan:#6b6260; --warn:#f0b35a; --warn-bg:#3a2c12; --bad:#ff8a80; --bad-bg:#3d1c1a;
-  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; --t-flex:#5fd0c2; --t-p2:#aab0f0; color-scheme:dark}}
+  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; --t-flex:#5fd0c2; --t-p2:#aab0f0; --t-rem:#f19a9a; --zero:#f0b35a; --zero-bg:#3a2c12; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#161312; --surface:#201c1b; --sunk:#2a2523; --ink:#f1ebe8; --muted:#a99e9b; --line:#3a3331;
   --accent:#e2575b; --accent-soft:#3a1f20; --on-accent:#1a0c0c;
   --done:#5fbf86; --reg:#7aa9dc; --plan:#6b6260; --warn:#f0b35a; --warn-bg:#3a2c12; --bad:#ff8a80; --bad-bg:#3d1c1a;
-  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; --t-flex:#5fd0c2; --t-p2:#aab0f0; color-scheme:dark}
+  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; --t-flex:#5fd0c2; --t-p2:#aab0f0; --t-rem:#f19a9a; --zero:#f0b35a; --zero-bg:#3a2c12; color-scheme:dark}
 body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
 #app{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
@@ -84,6 +84,20 @@ button{cursor:pointer}
 .warn{background:var(--warn-bg);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:14px}
 .warn.bad{background:var(--bad-bg)}
 .warn b{color:var(--warn)} .warn.bad b{color:var(--bad)}
+
+.sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.stack{display:flex;flex-direction:column;gap:8px;min-width:0}
+.stack .big{font:600 34px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.stack .big small{font:400 18px var(--body);color:var(--muted)}
+.cush{border-left:5px solid var(--done)}
+.cush.zero{border-left-color:var(--zero);background:var(--zero-bg)}
+.cush.bad{border-left-color:var(--bad);background:var(--bad-bg)}
+.cush.bad .big{color:var(--bad)} .cush.zero .big{color:var(--zero)}
+.preview{border-radius:8px;padding:9px 12px;font-size:14px;background:var(--sunk)}
+.preview.zero{background:var(--zero-bg)} .preview.bad{background:var(--bad-bg)}
+.preview.ok{background:color-mix(in srgb,var(--done) 12%,transparent)}
+.mrow.outside{background:var(--sunk)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* Calendar */
 .cal{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
@@ -155,7 +169,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
 <body>
 <main id="app" aria-live="polite"><p class="muted">Loading the planner…</p></main>
 
-<script id="p3-rules" type="application/json">{"reviewed":"2026-10-28","source":"Washington University Bulletin 2026–27, Doctor of Medicine (public)","calendar":{"start":"2026-03","end":"2027-05"},"rules":[{"id":"total","label":"Total Phase 3 weeks","kind":"min","weeks":64,"all":true,"tags":[],"codes":[],"away":"any","note":"Includes flex time. Phase 2 make-up rotations don't count."},{"id":"acr","label":"Advanced Clinical Rotations (ACRs)","kind":"min","weeks":12,"all":false,"tags":["ACR"],"codes":[],"away":"any","note":"Three 4-week ACRs, including the Internal Medicine ACR. The bulletin says the remaining two must be completed at WashU."},{"id":"imacr","label":"Internal Medicine ACR","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDICINE 9100"],"away":"any","note":""},{"id":"kisc","label":"KISCs","kind":"min","weeks":8,"all":false,"tags":["KISC"],"codes":[],"away":"any","note":"MSTP students take none."},{"id":"elec","label":"Electives","kind":"min","weeks":32,"all":false,"tags":["ELEC"],"codes":[],"away":"any","note":"Away electives and up to 4 weeks of Step study count here."},{"id":"cap","label":"Phase 3 Capstone","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8040"],"away":"any","note":""},{"id":"step","label":"Step study time","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8010"],"away":"any","note":"Counts toward electives."},{"id":"flex","label":"Flex time","kind":"max","weeks":8,"all":false,"tags":["FLEX"],"codes":[],"away":"any","note":"No credit, but it takes up time. Usually taken in 2-week blocks."},{"id":"away","label":"Away electives","kind":"max","weeks":12,"all":false,"tags":[],"codes":["MEDPHASE3 9998"],"away":"any","note":""},{"id":"intl","label":"International away electives","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 9999"],"away":"any","note":""}],"checklist":["Pass the Comprehensive Clinical Exam (MEDICINE 8330)","Take USMLE Step 1 before graduation","Take USMLE Step 2 CK before graduation"],"deadlines":[],"notes":["ACRs, KISCs, electives and the Capstone add up to 56 credit weeks. The other 8 of the 64 weeks are flex time, which earns no credit.","Rotations that make up missed Phase 2 credit take up time in your schedule but don't count toward Phase 3."]}</script>
+<script id="p3-rules" type="application/json">{"reviewed": "2026-10-28", "source": "Washington University Bulletin 2026–27, Doctor of Medicine (public)", "calendar": {"start": "2026-01", "end": "2027-04"}, "rules": [{"id": "acr", "label": "Advanced Clinical Rotations (ACRs)", "kind": "min", "weeks": 12, "all": false, "tags": ["ACR"], "codes": [], "away": "any", "note": "Three 4-week ACRs, including the Internal Medicine ACR. The bulletin says the remaining two must be completed at WashU."}, {"id": "imacr", "label": "Internal Medicine ACR", "kind": "min", "weeks": 4, "all": false, "tags": [], "codes": ["MEDICINE 9100"], "away": "any", "note": ""}, {"id": "kisc", "label": "KISCs", "kind": "min", "weeks": 8, "all": false, "tags": ["KISC"], "codes": [], "away": "any", "note": "MSTP students take none."}, {"id": "elec", "label": "Electives", "kind": "min", "weeks": 32, "all": false, "tags": ["ELEC"], "codes": [], "away": "any", "note": "Away electives and up to 4 weeks of Step 2 study count here."}, {"id": "cap", "label": "Phase 3 Capstone", "kind": "min", "weeks": 4, "all": false, "tags": [], "codes": ["MEDPHASE3 8040"], "away": "any", "note": ""}, {"id": "step", "label": "Step 2 study", "kind": "max", "weeks": 4, "all": false, "tags": [], "codes": ["MEDPHASE3 8010"], "away": "any", "note": "Step 1 study now happens before Phase 3. Counts toward electives; weeks over the limit don't count."}, {"id": "away", "label": "Away electives", "kind": "max", "weeks": 12, "all": false, "tags": [], "codes": ["MEDPHASE3 9998"], "away": "any", "note": ""}, {"id": "intl", "label": "International away electives", "kind": "max", "weeks": 4, "all": false, "tags": [], "codes": ["MEDPHASE3 9999"], "away": "any", "note": ""}], "checklist": ["Pass the Comprehensive Clinical Exam (MEDICINE 8330)", "Take USMLE Step 1 before graduation", "Take USMLE Step 2 CK before graduation"], "deadlines": [], "notes": ["Phase 3 is 64 weeks. 56 must be credit (ACRs, KISCs, electives, Capstone); the other 8 are the cushion.", "Flex time, vacation, remediation and Phase 2 make-up all take up Phase 3 time without earning Phase 3 credit, so they all use up the cushion."], "length": 64, "credit": 56}</script>
 
 <script id="p3-catalog" type="application/json">[
 ["ANESTH 8000","General Anesthesiology (Clinical Elective)","4","ELEC FOURWO"],
@@ -348,17 +362,30 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   const ymAdd = (ym, n) => { let [y, m] = ym.split('-').map(Number); m += n; y += Math.floor((m - 1) / 12); m = ((m - 1) % 12 + 12) % 12 + 1; return y + '-' + String(m).padStart(2, '0'); };
   const ymLabel = ym => { const [y, m] = ym.split('-').map(Number); return MONTHS[m - 1] + ' ' + y; };
   const ymCmp = (a, b) => a < b ? -1 : a > b ? 1 : 0;
-  const range = () => {
-    const from = plan.from || RULES.calendar.start, to = plan.to || RULES.calendar.end;
+  // ---------- Phase 3 window ----------
+  // A student's Phase 3 is a fixed run of 4-week blocks (64 weeks = 16 months by default).
+  const LEN = () => RULES.length || 64;
+  const CREDIT = () => RULES.credit || 56;
+  const winMonths = () => Math.max(1, Math.round(LEN() / 4));
+  const window_ = () => {
+    const from = plan.from || RULES.calendar.start;
+    const to = plan.to || (plan.from ? ymAdd(plan.from, winMonths() - 1) : RULES.calendar.end);
     const out = []; let ym = from; let guard = 0;
-    while (ymCmp(ym, to) <= 0 && guard++ < 48) { out.push(ym); ym = ymAdd(ym, 1); }
-    plan.entries.forEach(e => { if (e.ym && !out.includes(e.ym)) out.push(e.ym); });
+    while (ymCmp(ym, to) <= 0 && guard++ < 60) { out.push(ym); ym = ymAdd(ym, 1); }
+    return out;
+  };
+  const range = () => {
+    const out = window_();
+    plan.entries.forEach(e => { for (let i = 0; i < spanMonths(e); i++) { const ym = ymAdd(e.ym, i); if (e.ym && !out.includes(ym)) out.push(ym); } });
     return out.sort();
   };
 
   // ---------- Entry facts ----------
+  const NONCREDIT = ['FLEX', 'REM', 'P2'];
+  const isNonCredit = e => e.attrs.some(a => NONCREDIT.includes(a));
   const typeOf = e => {
     if (e.attrs.includes('FLEX')) return 'flex';
+    if (e.attrs.includes('REM')) return 'rem';
     if (e.attrs.includes('P2')) return 'p2';
     if (e.code === 'MEDPHASE3 8040') return 'cap';
     if (e.attrs.includes('ACR')) return 'acr';
@@ -366,13 +393,16 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     if (e.attrs.includes('ELEC')) return 'elec';
     return 'oth';
   };
-  const TYPE = { acr: ['ACR', '--t-acr'], kisc: ['KISC', '--t-kisc'], elec: ['Elective', '--t-elec'], cap: ['Capstone', '--t-cap'], flex: ['Flex', '--t-flex'], p2: ['Phase 2 credit', '--t-p2'], oth: ['Other', '--t-oth'] };
-  const isLong = e => { const c = BY_CODE[e.code]; return c ? c.kind === 'Longitudinal' : !!e.longitudinal; };
+  const TYPE = { acr: ['ACR', '--t-acr'], kisc: ['KISC', '--t-kisc'], elec: ['Elective', '--t-elec'], cap: ['Capstone', '--t-cap'], flex: ['Flex / vacation', '--t-flex'], rem: ['Remediation', '--t-rem'], p2: ['Phase 2 make-up', '--t-p2'], oth: ['Other', '--t-oth'] };
+  // "Alongside" rotations (longitudinal electives, a course over a break) earn credit without taking a block.
+  const isLong = e => { const c = BY_CODE[e.code]; return (c && c.kind === 'Longitudinal') || !!e.alongside || !!e.longitudinal; };
   const spanMonths = e => e.half === 'full' ? Math.max(1, Math.ceil(e.weeks / 4)) : 1;
   const STATUS = { planned: 'Planned', registered: 'Registered', done: 'Completed' };
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
   function matches(rule, e) {
-    if (e.attrs.includes('P2')) return false; // Phase 2 make-up takes up time but isn't Phase 3
+    // Flex, remediation and Phase 2 make-up never count toward a Phase 3 requirement unless a rule names their tag.
+    if (isNonCredit(e) && !(rule.tags || []).some(t => e.attrs.includes(t))) return false;
     if (rule.away === 'away' && !e.away) return false;
     if (rule.away === 'home' && e.away) return false;
     if (rule.all) return true;
@@ -380,8 +410,36 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     return (rule.tags || []).some(t => e.attrs.includes(t));
   }
 
+  // The cushion: the Phase 3 window has LEN weeks and CREDIT of them must be credit. Whatever is left
+  // is the cushion, and every non-credit week (flex, vacation, remediation, Phase 2 make-up, Step study
+  // over its limit) uses it up. Computed from the calendar so a longer or shorter window is handled too.
+  function cushion(entries) {
+    const win = window_(); const inWin = new Set(win);
+    const occ = new Set();
+    entries.filter(e => !isLong(e)).forEach(e => {
+      for (let i = 0; i < spanMonths(e); i++) {
+        const ym = ymAdd(e.ym, i); if (!inWin.has(ym)) continue;
+        (e.half === 'full' ? ['ab', 'cd'] : [e.half]).forEach(h => occ.add(ym + '|' + h));
+      }
+    });
+    const windowWeeks = win.length * 4, open = windowWeeks - occ.size * 2;
+    const creditS = { done: 0, registered: 0, planned: 0 };
+    entries.filter(e => !isNonCredit(e)).forEach(e => { creditS[e.status] += e.weeks; });
+    // Weeks over an "at most" limit don't count as credit.
+    let excess = 0; const overs = [];
+    RULES.rules.filter(r => r.kind === 'max').forEach(r => {
+      const s = entries.filter(e => !isNonCredit(e) && matches(r, e)).reduce((a, e) => a + e.weeks, 0);
+      if (s > r.weeks) { excess += s - r.weeks; overs.push({ label: r.label, weeks: s - r.weeks }); }
+    });
+    const credit = creditS.done + creditS.registered + creditS.planned - excess;
+    const needed = Math.max(0, CREDIT() - credit);
+    const used = { flex: 0, rem: 0, p2: 0 };
+    entries.forEach(e => { const t = typeOf(e); if (t in used) used[t] += e.weeks; });
+    return { win, windowWeeks, open, creditS, excess, overs, credit, needed, left: open - needed, used };
+  }
+
   function evaluate() {
-    const rules = RULES.rules.map(r => {
+    const rules = RULES.rules.filter(r => !r.all).map(r => {
       const s = { done: 0, registered: 0, planned: 0 };
       plan.entries.forEach(e => { if (matches(r, e)) s[e.status] += e.weeks; });
       const sum = s.done + s.registered + s.planned;
@@ -390,9 +448,10 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       else state = s.done >= r.weeks ? 'done' : s.done + s.registered >= r.weeks ? 'reg' : sum >= r.weeks ? 'planned' : 'short';
       return { r, s, sum, state };
     });
+    const cu = cushion(plan.entries);
     const warns = [];
-    rules.forEach(x => { if (x.r.kind === 'max' && x.state === 'over') warns.push({ bad: true, t: `<b>${esc(x.r.label)}:</b> ${x.sum} weeks planned, the limit is ${x.r.weeks}.` }); });
-    // Overlaps (longitudinal electives run alongside other courses, so they are skipped).
+    rules.forEach(x => { if (x.r.kind === 'max' && x.state === 'over') warns.push({ bad: true, t: `<b>${esc(x.r.label)}:</b> ${x.sum} weeks planned, the limit is ${x.r.weeks}. The ${plural(x.sum - x.r.weeks, 'week')} over the limit won't count as credit.` }); });
+    // Overlaps (rotations that run alongside other blocks are skipped).
     const occ = {};
     plan.entries.filter(e => !isLong(e)).forEach(e => {
       for (let i = 0; i < spanMonths(e); i++) {
@@ -424,9 +483,9 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       const c = BY_CODE[list[0].code];
       if (list.length > 1 && (c.attrs.includes('TWOWO') || c.attrs.includes('FOURWO'))) warns.push({ t: `<b>${esc(c.name)}</b> is in your plan ${list.length} times. The bulletin lists it as a ${c.attrs.includes('TWOWO') ? '2' : '4'}-week-only course, not a repeatable one. Check that it can count twice.` });
     });
-    const outside = plan.entries.filter(e => ymCmp(e.ym, RULES.calendar.start) < 0 || ymCmp(e.ym, RULES.calendar.end) > 0);
-    if (outside.length) warns.push({ t: `<b>${outside.length} rotation${outside.length > 1 ? 's are' : ' is'} outside ${ymLabel(RULES.calendar.start)}–${ymLabel(RULES.calendar.end)},</b> the Phase 3 window set in the rules.` });
-    return { rules, warns, conflict };
+    const outside = plan.entries.filter(e => !cu.win.includes(e.ym));
+    if (outside.length) warns.push({ t: `<b>${plural(outside.length, 'rotation')} ${outside.length > 1 ? 'are' : 'is'} outside your Phase 3 (${ymLabel(cu.win[0])}–${ymLabel(cu.win[cu.win.length - 1])}).</b> ${outside.length > 1 ? "They don't" : "It doesn't"} take up Phase 3 time. Change "My Phase 3" above the schedule if your dates are different.` });
+    return { rules, warns, conflict, cu };
   }
 
   // ---------- Render ----------
@@ -439,31 +498,40 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     if (x.r.kind === 'max') return x.state === 'over' ? '<span class="pill over">Over limit</span>' : '<span class="pill ok">Within limit</span>';
     return { done: '<span class="pill ok">Completed</span>', reg: '<span class="pill reg">Registered</span>', planned: '<span class="pill short">Planned</span>', short: `<span class="pill short">${Math.max(0, x.r.weeks - x.sum)} wk to go</span>` }[x.state];
   };
+  function cushionState(cu) {
+    if (cu.left < 0) return { cls: 'bad', head: `${plural(-cu.left, 'week')} short`, text: `Even if every open week becomes a credit rotation, you'd reach ${cu.credit + cu.open} of ${CREDIT()} credit weeks. Rotations that run alongside your blocks (a longitudinal elective, a course over a break) are the usual fix; ask the Phase 3 Registration &amp; Electives Office early.` };
+    if (cu.left === 0) return { cls: 'zero', head: 'No cushion left', text: `Every open week has to be a credit rotation. Any flex, vacation or remediation from here puts you short.` };
+    return { cls: 'ok', head: `${plural(cu.left, 'week')} of cushion left`, text: `You can spend ${cu.left === 1 ? 'this week' : 'these weeks'} on flex, vacation or anything else without credit and still graduate on time.` };
+  }
 
   function render() {
-    const ev = evaluate();
-    const total = ev.rules.find(x => x.r.all && x.r.kind === 'min');
-    const mins = ev.rules.filter(x => x.r.kind === 'min' && x !== total);
+    const ev = evaluate(), cu = ev.cu;
+    const mins = ev.rules.filter(x => x.r.kind === 'min');
     const maxes = ev.rules.filter(x => x.r.kind === 'max');
     const reviewed = RULES.reviewed ? new Date(RULES.reviewed + 'T12:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
     const months = range();
+    const st = cushionState(cu);
+    const std = LEN() - CREDIT();
 
     let h = `<header class="head"><div><h1>Phase 3 Planner</h1>
       <p class="meta">Plan your post-clerkship rotations against the graduation requirements. Rules from the ${esc(RULES.source)}${reviewed ? ', last reviewed ' + esc(reviewed) : ''}. Your plan stays in this browser.</p></div>
       <div class="row"><button class="btn primary" data-act="add">Add rotation</button></div></header>`;
 
-    if (plan.example) h += `<div class="banner"><span><b>This is an example plan</b> to show how the planner works. It isn't anyone's real schedule.</span><button class="btn" data-act="clear-example">Clear it and start my own</button></div>`;
-    else if (!plan.entries.length) h += `<div class="banner"><span>Start by adding the rotations you've done or registered for, then plan the rest.</span><button class="btn" data-act="example">Show an example plan</button></div>`;
+    if (plan.example) h += `<div class="banner"><span><b>This is an example plan,</b> not anyone's real schedule. It shows a student who made up a clerkship during Phase 3, then took remediation and a flex block.</span><button class="btn" data-act="clear-example">Clear it and start my own</button></div>`;
+    else if (!plan.entries.length) h += `<div class="banner"><span>Set your Phase 3 dates under "Your schedule," add what you've done or registered for, then plan the rest.</span><button class="btn" data-act="example">Show an example plan</button></div>`;
 
-    // Summary
+    // Summary: credit weeks and the cushion
     h += `<section class="section" aria-labelledby="sum-h"><div class="section-head"><h2 id="sum-h">Graduation requirements</h2>
-      <div class="legend"><span style="--c:var(--done)">Completed</span><span style="--c:var(--reg)">Registered</span><span style="--c:var(--plan)">Planned</span></div></div>`;
-    if (total) {
-      const t = total.s, sum = t.done + t.registered + t.planned;
-      h += `<div class="panel total"><div class="big">${sum}<small> / ${total.r.weeks} weeks</small></div>
-        <div style="display:flex;flex-direction:column;gap:6px;min-width:0">${bar(t, total.r.weeks)}
-        <p class="small muted">${t.done} completed · ${t.registered} registered · ${t.planned} planned · ${Math.max(0, total.r.weeks - sum)} still to plan</p>${extraLine()}</div></div>`;
-    }
+      <div class="legend"><span style="--c:var(--done)">Completed</span><span style="--c:var(--reg)">Registered</span><span style="--c:var(--plan)">Planned</span></div></div>
+      <div class="sumgrid">
+        <div class="panel stack"><p class="flabel">Credit weeks</p><div class="big">${cu.credit}<small> / ${CREDIT()}</small></div>${bar(cu.creditS, CREDIT())}
+          <p class="small muted">${cu.creditS.done} completed · ${cu.creditS.registered} registered · ${cu.creditS.planned} planned · <b>${cu.needed} still needed</b></p>
+          ${cu.overs.length ? `<p class="small muted">${cu.overs.map(o => `${plural(o.weeks, 'week')} of ${esc(o.label.toLowerCase())} over the limit not counted.`).join(' ')}</p>` : ''}</div>
+        <div class="panel stack cush ${st.cls}"><p class="flabel">Cushion</p><div class="big">${esc(st.head)}</div>
+          <p class="small">${st.text}</p>
+          <p class="small muted">Your Phase 3 is ${ymLabel(cu.win[0])} to ${ymLabel(cu.win[cu.win.length - 1])}: ${cu.windowWeeks} weeks, ${cu.open} of them still open. A standard Phase 3 has ${std} weeks of cushion (${LEN()} weeks minus ${CREDIT()} credit weeks).</p>
+          ${(cu.used.p2 || cu.used.rem || cu.used.flex || cu.excess) ? `<p class="small muted">Used so far: ${[cu.used.p2 && `Phase 2 make-up ${cu.used.p2}`, cu.used.rem && `remediation ${cu.used.rem}`, cu.used.flex && `flex / vacation ${cu.used.flex}`, cu.excess && `over-limit weeks ${cu.excess}`].filter(Boolean).join(' · ')}.</p>` : ''}</div>
+      </div>`;
     if (ev.warns.length) h += `<div class="warns">${ev.warns.map(w => `<div class="warn${w.bad ? ' bad' : ''}">${w.t}</div>`).join('')}</div>`;
     h += `<div class="reqs">${mins.map(x => `<div class="req"><div class="top"><h3>${esc(x.r.label)}</h3>${pill(x)}</div>${bar(x.s, x.r.weeks)}
       <div class="top"><span class="sub">${x.s.done} done · ${x.s.registered} reg · ${x.s.planned} planned</span><span class="num">${x.sum} / ${x.r.weeks} wk</span></div>
@@ -474,17 +542,18 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
 
     // Calendar
     h += `<section class="section" aria-labelledby="cal-h"><div class="section-head"><h2 id="cal-h">Your schedule</h2>
-      <div class="row small"><label class="muted" for="from">Show</label><input type="month" id="from" value="${esc(months[0] || '')}" class="btn ghost" style="font-weight:400">
-      <label class="muted" for="to">to</label><input type="month" id="to" value="${esc(months[months.length - 1] || '')}" class="btn ghost" style="font-weight:400"></div></div>
+      <div class="row small"><span class="muted">My Phase 3:</span><label class="sr" for="from">Starts</label><input type="month" id="from" value="${esc(cu.win[0])}" class="btn ghost" style="font-weight:400">
+      <label class="muted" for="to">to</label><input type="month" id="to" value="${esc(cu.win[cu.win.length - 1])}" class="btn ghost" style="font-weight:400"></div></div>
       <div class="cal"><div class="cal-head"><span>Month</span><span>Weeks 1–2</span><span>Weeks 3–4</span></div>`;
     const cont = {};
-    plan.entries.forEach(e => { for (let i = 1; i < spanMonths(e); i++) (cont[ymAdd(e.ym, i)] = cont[ymAdd(e.ym, i)] || []).push(e); });
+    plan.entries.filter(e => !isLong(e)).forEach(e => { for (let i = 1; i < spanMonths(e); i++) (cont[ymAdd(e.ym, i)] = cont[ymAdd(e.ym, i)] || []).push(e); });
     months.forEach(ym => {
       const list = plan.entries.filter(e => e.ym === ym && !isLong(e)).concat(cont[ym] || []);
       const full = list.filter(e => e.half === 'full'), ab = list.filter(e => e.half === 'ab'), cd = list.filter(e => e.half === 'cd');
       const abFree = !full.length && !ab.length, cdFree = !full.length && !cd.length;
       const [y, m] = ym.split('-');
-      h += `<div class="mrow"><div class="mlab">${MONTHS[+m - 1]}<small>${y}</small></div>`;
+      const out = !cu.win.includes(ym);
+      h += `<div class="mrow${out ? ' outside' : ''}"><div class="mlab">${MONTHS[+m - 1]}<small>${y}${out ? ' · outside Phase 3' : ''}</small></div>`;
       full.forEach(e => h += `<div class="slot s-full">${chip(e, ev.conflict, e.ym !== ym)}</div>`);
       ab.forEach(e => h += `<div class="slot s-ab">${chip(e, ev.conflict)}</div>`);
       cd.forEach(e => h += `<div class="slot s-cd">${chip(e, ev.conflict)}</div>`);
@@ -493,7 +562,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       h += `</div>`;
     });
     const longs = plan.entries.filter(isLong);
-    if (longs.length) h += `<div class="longrow"><span class="small muted">Longitudinal, alongside other courses:</span>${longs.map(e => chip(e, new Set())).join('')}</div>`;
+    if (longs.length) h += `<div class="longrow"><span class="small muted">Alongside your blocks (credit without taking a block):</span>${longs.map(e => chip(e, new Set())).join('')}</div>`;
     h += `</div></section>`;
 
     // Checklist
@@ -505,8 +574,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     }
 
     // Rules
-    h += `<section class="section" aria-labelledby="rules-h"><div class="section-head"><h2 id="rules-h">How your plan is checked</h2>
-</div>`;
+    h += `<section class="section" aria-labelledby="rules-h"><div class="section-head"><h2 id="rules-h">How your plan is checked</h2></div>`;
     h += rulesView();
     h += `</section>`;
 
@@ -521,35 +589,34 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     if (ui.modal) renderModal();
   }
 
-  function extraLine() {
-    const wk = f => plan.entries.filter(f).reduce((a, e) => a + e.weeks, 0);
-    const flex = wk(e => e.attrs.includes('FLEX')), p2 = wk(e => e.attrs.includes('P2'));
-    const bits = [];
-    if (flex) bits.push(`Includes ${flex} week${flex > 1 ? 's' : ''} of flex time.`);
-    if (p2) bits.push(`${p2} week${p2 > 1 ? 's' : ''} of Phase 2 credit not counted here.`);
-    return bits.length ? `<p class="small muted">${bits.join(' ')}</p>` : '';
-  }
-
   function chip(e, conflict, continued) {
     const [lab, col] = TYPE[typeOf(e)];
-    const when = isLong(e) ? 'Longitudinal' : e.half === 'full' ? (e.weeks > 4 ? `${e.weeks} weeks` : 'Full block') : e.half === 'ab' ? 'Weeks 1–2' : 'Weeks 3–4';
+    const when = isLong(e) ? `${plural(e.weeks, 'credit week')}, alongside` : e.half === 'full' ? (e.weeks > 4 ? `${e.weeks} weeks` : 'Full block') : e.half === 'ab' ? 'Weeks 1–2' : 'Weeks 3–4';
     return `<button class="chip st-${e.status}${conflict.has(e.id) ? ' conflict' : ''}" style="--tc:var(${col})" data-act="edit" data-id="${e.id}">
       <span class="ct">${continued ? '↳ ' : ''}${esc(e.name)}</span>
-      <span class="cm"><span class="typetag">${lab}</span><span>${when}</span><span>${STATUS[e.status]}</span>${e.away ? '<span>Away</span>' : ''}</span></button>`;
+      <span class="cm"><span class="typetag">${lab}</span><span>${when}</span><span>${STATUS[e.status]}</span>${e.away ? '<span>Away</span>' : ''}${isNonCredit(e) ? '<span>No Phase 3 credit</span>' : ''}</span></button>`;
   }
 
   function ruleLine(r) {
-    const what = r.all ? 'Every rotation except Phase 2 make-up' : [...(r.tags || []).map(t => ({ ACR: 'ACRs', KISC: 'KISCs', ELEC: 'electives', FLEX: 'flex time' }[t] || t)), ...(r.codes || []).map(c => (BY_CODE[c] ? BY_CODE[c].name : c) + ' (' + c + ')')].join(', ') || 'Nothing selected';
+    const what = [...(r.tags || []).map(t => ({ ACR: 'ACRs', KISC: 'KISCs', ELEC: 'electives', FLEX: 'flex / vacation' }[t] || t)), ...(r.codes || []).map(c => (BY_CODE[c] ? BY_CODE[c].name : c) + ' (' + c + ')')].join(', ') || 'Nothing selected';
     const where = r.away === 'away' ? ', away only' : r.away === 'home' ? ', at WashU only' : '';
     return `${what}${where}`;
   }
   function rulesView() {
-    let h = `<div class="panel"><div class="rules-list">${RULES.rules.map(r => `<div class="rl"><span>${esc(r.label)}</span><span class="rv">${r.kind === 'max' ? 'At most' : 'At least'} ${r.weeks} wk</span><span class="rd">Counts: ${esc(ruleLine(r))}${r.note ? ' · ' + esc(r.note) : ''}</span></div>`).join('')}</div></div>`;
+    const base = `<div class="rl"><span>Phase 3 length</span><span class="rv">${LEN()} wk</span><span class="rd">${winMonths()} months of 4-week blocks. Set your own dates under "Your schedule."</span></div>
+      <div class="rl"><span>Credit weeks required</span><span class="rv">At least ${CREDIT()} wk</span><span class="rd">ACRs, KISCs, electives and the Capstone. Rotations alongside your blocks count too.</span></div>
+      <div class="rl"><span>Cushion</span><span class="rv">${LEN() - CREDIT()} wk</span><span class="rd">Flex, vacation, remediation, Phase 2 make-up and weeks over a limit all use it up.</span></div>`;
+    let h = `<div class="panel"><div class="rules-list">${base}${RULES.rules.filter(r => !r.all).map(r => `<div class="rl"><span>${esc(r.label)}</span><span class="rv">${r.kind === 'max' ? 'At most' : 'At least'} ${r.weeks} wk</span><span class="rd">Counts: ${esc(ruleLine(r))}${r.note ? ' · ' + esc(r.note) : ''}</span></div>`).join('')}</div></div>`;
     if (RULES.notes.length) h += `<div class="notes">${RULES.notes.map(n => `<p class="muted">${esc(n)}</p>`).join('')}</div>`;
     return h;
   }
 
   // ---------- Add / edit modal ----------
+  const SPECIAL = {
+    flex: { attrs: ['FLEX'], label: 'Flex / vacation', sub: 'No credit, but it takes up 2 weeks.', col: '--t-flex', weeks: [2, 2] },
+    rem: { attrs: ['REM'], label: 'Remediation', sub: 'Required time that earns no Phase 3 credit.', col: '--t-rem', weeks: [1, 8], named: 'What is it for? (optional)', ph: 'e.g. Surgery remediation' },
+    p2: { attrs: ['P2'], label: 'Phase 2 make-up', sub: 'Counts toward Phase 2, not Phase 3, but it takes up Phase 3 time.', col: '--t-p2', weeks: [1, 12], named: 'What are you making up?', ph: 'e.g. Surgery clerkship', required: true }
+  };
   function openModal(entry, preset) {
     ui.modal = entry ? { id: entry.id, draft: Object.assign({}, entry), q: '' } : { id: null, draft: { ym: (preset && preset.ym) || '', half: (preset && preset.half) || '', status: 'planned', away: false }, q: '' };
     renderModal();
@@ -557,35 +624,82 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   }
   function closeModal() { ui.modal = null; const s = document.querySelector('.scrim'); if (s) s.remove(); }
 
+  // Turns the dialog's draft into a plan entry, or {error}.
+  function buildEntry(d, id) {
+    const c = d.code && !d.custom && !d.special ? BY_CODE[d.code] : null;
+    const e = { id: id || uid(), status: d.status || 'planned', ym: d.ym, away: !!d.away };
+    if (d.special) {
+      const sp = SPECIAL[d.special];
+      if (sp.required && !d.name) return { error: 'Say what you are making up, e.g. Surgery clerkship.' };
+      const wk = Math.min(sp.weeks[1], Math.max(sp.weeks[0], d.weeks || sp.weeks[0]));
+      Object.assign(e, { code: '', name: d.name || sp.label, attrs: sp.attrs.slice(), custom: true, special: d.special, weeks: wk, away: false });
+      e.half = wk <= 2 ? d.half : 'full';
+    } else if (c) {
+      Object.assign(e, { code: c.code, name: c.name, attrs: c.attrs.slice() });
+      if (c.kind === 'Longitudinal') { e.weeks = c.units; e.half = 'full'; }
+      else if (c.units) { e.weeks = c.units; e.half = c.units === 2 ? d.half : 'full'; }
+      else { e.weeks = Math.min(c.max, Math.max(c.min, d.weeks || 4)); e.half = e.weeks <= 2 ? d.half : 'full'; }
+      if (c.code === 'MEDPHASE3 9998' || c.code === 'MEDPHASE3 9999') e.away = true;
+    } else {
+      if (!d.name) return { error: 'Give the rotation a name.' };
+      Object.assign(e, { code: d.code || '', name: d.name, attrs: d.attrs || ['ELEC'], custom: true, alongside: !!d.alongside, weeks: Math.min(52, Math.max(1, d.weeks || 4)) });
+      e.half = e.alongside ? 'full' : e.weeks <= 2 ? d.half : 'full';
+    }
+    if (!e.ym) return { error: 'Choose a month.' };
+    if (e.half !== 'full' && e.half !== 'ab' && e.half !== 'cd') return { error: 'Choose weeks 1–2 or weeks 3–4.' };
+    return { entry: e };
+  }
+
+  // What this rotation does to the cushion, shown before it's saved.
+  function previewLine(d) {
+    const tmp = Object.assign({}, d, { ym: d.ym || window_()[0], half: d.half || 'ab' });
+    const b = buildEntry(Object.assign(tmp, { name: tmp.name || 'x' }), ui.modal.id || '__draft');
+    if (!b.entry) return '';
+    const e = b.entry;
+    const others = plan.entries.filter(x => x.id !== ui.modal.id);
+    const before = cushion(others), after = cushion(others.concat([e]));
+    const delta = before.left - after.left;
+    if (isNonCredit(e)) {
+      if (after.left < 0) return `<div class="preview bad">This uses ${plural(e.weeks, 'week')} of your cushion and leaves you <b>${plural(-after.left, 'week')} short</b> of the ${CREDIT()} credit weeks.</div>`;
+      if (after.left === 0) return `<div class="preview zero">This uses the last of your cushion. After this, every open week has to be a credit rotation.</div>`;
+      return `<div class="preview ok">This uses ${plural(e.weeks, 'week')} of your cushion. You'd have ${plural(after.left, 'week')} left.</div>`;
+    }
+    if (delta > 0 && after.left < 0) return `<div class="preview bad">The ${plural(delta, 'week')} over a limit won't count as credit, which leaves you <b>${plural(-after.left, 'week')} short</b>.</div>`;
+    if (isLong(e) && after.left > before.left) return `<div class="preview ok">Adds ${plural(e.weeks, 'credit week')} without taking up a block. ${after.left < 0 ? 'You would still be ' + plural(-after.left, 'week') + ' short.' : after.left === 0 ? 'That closes the gap, with no cushion to spare.' : 'You would have ' + plural(after.left, 'week') + ' of cushion.'}</div>`;
+    return '';
+  }
+
   function renderModal() {
     let s = document.querySelector('.scrim');
     if (!s) { s = document.createElement('div'); s.className = 'scrim'; document.body.appendChild(s); s.addEventListener('click', ev => { if (ev.target === s) closeModal(); }); }
-    const M = ui.modal, d = M.draft, c = d.code ? BY_CODE[d.code] : null;
+    const M = ui.modal, d = M.draft, c = d.code && !d.custom && !d.special ? BY_CODE[d.code] : null, sp = d.special ? SPECIAL[d.special] : null;
     const months = range();
     let h = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-h"><div class="section-head"><h2 id="m-h">${M.id ? 'Edit rotation' : 'Add a rotation'}</h2><button class="btn ghost" data-act="m-close" aria-label="Close">Close</button></div>`;
-    if (!d.code && !d.custom) {
+    if (!d.code && !d.custom && !d.special) {
       const q = M.q.trim().toLowerCase();
       const res = CATALOG.filter(x => !q || (x.code + ' ' + x.title).toLowerCase().includes(q)).slice(0, 60);
       h += `<div class="field"><label for="m-q">Find a course</label><input id="m-q" type="search" autocomplete="off" placeholder="Name, department or code, e.g. MICU, KISC, EMED" value="${esc(M.q)}"></div>
         <div class="results" id="m-res">${res.map(x => { const [lab, col] = TYPE[typeOf({ code: x.code, attrs: x.attrs })]; return `<button class="res" style="--tc:var(${col})" data-act="pick" data-code="${esc(x.code)}"><span class="rt">${esc(x.name)}</span><span class="rc">${esc(x.code)}${x.kind && x.kind !== lab ? ' · ' + esc(x.kind) : ''}</span><span class="rw">${lab} · ${x.units ? x.units + ' wk' : x.min + '–' + x.max + ' wk'}</span></button>`; }).join('') || '<p class="small muted" style="padding:10px">No matches in the bulletin catalog.</p>'}</div>
-        <div class="row small"><span class="muted">Not a course?</span><button class="btn" data-act="special" data-kind="flex" style="--tc:var(--t-flex)">Flex time</button><button class="btn" data-act="special" data-kind="p2">Phase 2 make-up</button><button class="btn ghost" data-act="custom">Something else, by hand</button></div>`;
+        <div class="row small"><span class="muted">Not a course?</span><button class="btn" data-act="special" data-kind="flex">Flex / vacation</button><button class="btn" data-act="special" data-kind="rem">Remediation</button><button class="btn" data-act="special" data-kind="p2">Phase 2 make-up</button><button class="btn ghost" data-act="custom">Something else, by hand</button></div>`;
     } else {
       const [lab, col] = TYPE[typeOf({ code: d.code, attrs: d.attrs || (c ? c.attrs : []) })];
-      if (d.special === 'flex') h += `<div class="chosen" style="--tc:var(--t-flex)"><div><div style="font-weight:600">Flex time</div><div class="small muted">2 weeks · no credit, but it takes up time</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
-      else if (d.special === 'p2') h += `<div class="chosen" style="--tc:var(--t-p2)"><div style="min-width:0;flex:1"><div class="field"><label for="m-name">What are you making up?</label><input id="m-name" value="${esc(d.name || '')}" placeholder="e.g. Surgery clerkship"></div><div class="small muted" style="margin-top:6px">Phase 2 credit. Takes up time in your schedule but doesn't count toward Phase 3.</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
-      else if (c) h += `<div class="chosen" style="--tc:var(${col})"><div><div style="font-weight:600">${esc(c.name)}</div><div class="small muted">${esc(c.code)} · ${lab}${c.units ? ' · ' + c.units + ' weeks' : ''}</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
-      else if (!d.special) h += `<div class="grid2"><div class="field" style="grid-column:1 / -1"><label for="m-name">Rotation name</label><input id="m-name" value="${esc(d.name || '')}" placeholder="e.g. Away sub-I, Cardiology at another school"></div>
+      const change = M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>';
+      if (sp) h += `<div class="chosen" style="--tc:var(${sp.col})"><div style="min-width:0;flex:1"><div style="font-weight:600">${sp.label}</div><div class="small muted">${sp.sub}</div>${sp.named ? `<div class="field" style="margin-top:8px"><label for="m-name">${sp.named}</label><input id="m-name" value="${esc(d.name && d.name !== sp.label ? d.name : '')}" placeholder="${sp.ph}"></div>` : ''}</div>${change}</div>`;
+      else if (c) h += `<div class="chosen" style="--tc:var(${col})"><div><div style="font-weight:600">${esc(c.name)}</div><div class="small muted">${esc(c.code)} · ${lab}${c.units ? ' · ' + c.units + ' weeks' : ''}</div></div>${change}</div>`;
+      else h += `<div class="grid2"><div class="field" style="grid-column:1 / -1"><label for="m-name">Rotation name</label><input id="m-name" value="${esc(d.name || '')}" placeholder="e.g. Away sub-I, reading elective over winter break"></div>
         <div class="field"><label for="m-type">Counts as</label><select id="m-type">${[['ELEC', 'Elective'], ['ACR', 'ACR'], ['KISC', 'KISC'], ['', 'Other']].map(([v, l]) => `<option value="${v}" ${(d.attrs || ['ELEC'])[0] === v || (!v && !(d.attrs || ['ELEC']).length) ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-        <div class="field"><label for="m-code">Course code (optional)</label><input id="m-code" value="${esc(d.code || '')}" placeholder="e.g. MEDPHASE3 9998"></div></div>`;
-      const fixed = (c && c.units && !(c.kind === 'Longitudinal')) || d.special === 'flex';
-      const weeksOpts = fixed ? null : (c ? [c.min || 1, c.max || 4] : [1, 12]);
-      h += `<div class="grid2"><div class="field"><label for="m-ym">Month</label><select id="m-ym"><option value="">Choose…</option>${months.map(ym => `<option value="${ym}" ${d.ym === ym ? 'selected' : ''}>${ymLabel(ym)}</option>`).join('')}</select></div>`;
-      if (!fixed) h += `<div class="field"><label for="m-weeks">Weeks</label><input id="m-weeks" type="number" min="${weeksOpts[0]}" max="${weeksOpts[1]}" value="${d.weeks || (c && c.kind === 'Longitudinal' ? c.units : 4)}"></div>`;
+        <div class="field"><label for="m-code">Course code (optional)</label><input id="m-code" value="${esc(d.code || '')}" placeholder="e.g. MEDPHASE3 9998"></div>
+        <label class="small" style="grid-column:1 / -1;display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="m-along" ${d.alongside ? 'checked' : ''} style="margin-top:3px"> Runs alongside my other blocks (a longitudinal elective, or a course over a break). It earns credit without taking up a block.</label></div>`;
+      const fixed = (c && c.units && !(c.kind === 'Longitudinal')) || (sp && sp.weeks[0] === sp.weeks[1]);
+      const weeksOpts = fixed ? null : sp ? sp.weeks : (c ? [c.min || 1, c.max || 4] : [1, 12]);
+      h += `<div class="grid2"><div class="field"><label for="m-ym">${d.alongside ? 'Starts in' : 'Month'}</label><select id="m-ym"><option value="">Choose…</option>${months.map(ym => `<option value="${ym}" ${d.ym === ym ? 'selected' : ''}>${ymLabel(ym)}</option>`).join('')}</select></div>`;
+      if (!fixed) h += `<div class="field"><label for="m-weeks">Weeks</label><input id="m-weeks" type="number" min="${weeksOpts[0]}" max="${weeksOpts[1]}" value="${d.weeks || (c && c.kind === 'Longitudinal' ? c.units : sp ? sp.weeks[0] : 4)}"></div>`;
       h += `<div class="field"><label for="m-status">Status</label><select id="m-status">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}" ${d.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`;
-      const twoWeek = d.special === 'flex' ? true : fixed ? c.units === 2 : (d.weeks || 4) <= 2;
-      if (!(c && c.kind === 'Longitudinal')) h += `<div class="field"><span class="flabel">Which weeks</span><div class="seg" role="group" aria-label="Which weeks">${twoWeek ? `<button data-act="half" data-half="ab" aria-pressed="${d.half === 'ab'}">Weeks 1–2</button><button data-act="half" data-half="cd" aria-pressed="${d.half === 'cd'}">Weeks 3–4</button>` : `<button aria-pressed="true" disabled>Starts week 1 of the month</button>`}</div></div>`;
+      const twoWeek = sp && sp.weeks[1] === 2 ? true : fixed ? c.units === 2 : (d.weeks || 4) <= 2;
+      if (!(c && c.kind === 'Longitudinal') && !d.alongside) h += `<div class="field"><span class="flabel">Which weeks</span><div class="seg" role="group" aria-label="Which weeks">${twoWeek ? `<button data-act="half" data-half="ab" aria-pressed="${d.half === 'ab'}">Weeks 1–2</button><button data-act="half" data-half="cd" aria-pressed="${d.half === 'cd'}">Weeks 3–4</button>` : `<button aria-pressed="true" disabled>Starts week 1 of the month</button>`}</div></div>`;
       const autoAway = d.code === 'MEDPHASE3 9998' || d.code === 'MEDPHASE3 9999';
-      if (!d.special) h += `<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="m-away" ${d.away || autoAway ? 'checked' : ''} ${autoAway ? 'disabled' : ''}> Away rotation (not at WashU)</label>`;
+      if (!sp) h += `<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="m-away" ${d.away || autoAway ? 'checked' : ''} ${autoAway ? 'disabled' : ''}> Away rotation (not at WashU)</label>`;
+      h += previewLine(d);
       h += `<p class="small" id="m-err" role="alert" style="color:var(--bad)"></p>
         <div class="row"><button class="btn primary" data-act="m-save">${M.id ? 'Save changes' : 'Add to plan'}</button>${M.id ? '<button class="btn ghost danger" data-act="m-del">Remove</button>' : ''}</div>`;
     }
@@ -593,8 +707,13 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     s.innerHTML = h;
     const q = document.getElementById('m-q');
     if (q) q.addEventListener('input', () => { ui.modal.q = q.value; const pos = q.selectionStart; renderModal(); const nq = document.getElementById('m-q'); nq.focus(); try { nq.setSelectionRange(pos, pos); } catch (e) {} });
+    const rerender = () => setTimeout(() => { if (ui.modal) renderModal(); }, 0);
     const w = document.getElementById('m-weeks');
-    if (w) w.addEventListener('change', () => { syncDraft(); if ((ui.modal.draft.weeks || 4) > 2) ui.modal.draft.half = 'full'; setTimeout(() => { if (ui.modal) renderModal(); }, 0); });
+    if (w) w.addEventListener('change', () => { syncDraft(); if ((ui.modal.draft.weeks || 4) > 2) ui.modal.draft.half = 'full'; rerender(); });
+    const al = document.getElementById('m-along');
+    if (al) al.addEventListener('change', () => { syncDraft(); rerender(); });
+    const sel = document.getElementById('m-status');
+    if (sel) sel.addEventListener('change', () => { syncDraft(); });
   }
   function syncDraft() {
     const d = ui.modal.draft; const g = id => document.getElementById(id);
@@ -605,30 +724,13 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     if (g('m-name')) d.name = g('m-name').value.trim();
     if (g('m-type')) d.attrs = g('m-type').value ? [g('m-type').value] : [];
     if (g('m-code')) d.code = g('m-code').value.trim().toUpperCase().replace(/\s+/g, ' ');
+    if (g('m-along')) d.alongside = g('m-along').checked;
   }
   function saveModal() {
     syncDraft();
-    const d = ui.modal.draft, c = d.code && !d.custom && !d.special ? BY_CODE[d.code] : null, err = document.getElementById('m-err');
-    const e = { id: ui.modal.id || uid(), status: d.status || 'planned', ym: d.ym, away: !!d.away };
-    if (d.special === 'flex') {
-      Object.assign(e, { code: '', name: 'Flex time', attrs: ['FLEX'], custom: true, special: 'flex', weeks: 2, half: d.half, away: false });
-    } else if (d.special === 'p2') {
-      if (!d.name) { err.textContent = 'Say what you are making up, e.g. Surgery clerkship.'; return; }
-      Object.assign(e, { code: '', name: d.name, attrs: ['P2'], custom: true, special: 'p2', weeks: Math.min(12, Math.max(1, d.weeks || 4)), away: false });
-      e.half = e.weeks <= 2 ? d.half : 'full';
-    } else if (c) {
-      Object.assign(e, { code: c.code, name: c.name, attrs: c.attrs.slice() });
-      if (c.kind === 'Longitudinal') { e.weeks = c.units; e.half = 'full'; }
-      else if (c.units) { e.weeks = c.units; e.half = c.units === 2 ? d.half : 'full'; }
-      else { e.weeks = Math.min(c.max, Math.max(c.min, d.weeks || 4)); e.half = e.weeks <= 2 ? d.half : 'full'; }
-      if (c.code === 'MEDPHASE3 9998' || c.code === 'MEDPHASE3 9999') e.away = true;
-    } else {
-      if (!d.name) { err.textContent = 'Give the rotation a name.'; return; }
-      Object.assign(e, { code: d.code || '', name: d.name, attrs: d.attrs || ['ELEC'], custom: true, weeks: Math.min(52, Math.max(1, d.weeks || 4)) });
-      e.half = e.weeks <= 2 ? d.half : 'full';
-    }
-    if (!e.ym) { err.textContent = 'Choose a month.'; return; }
-    if (e.half !== 'full' && e.half !== 'ab' && e.half !== 'cd') { err.textContent = 'Choose weeks 1–2 or weeks 3–4.'; return; }
+    const b = buildEntry(ui.modal.draft, ui.modal.id), err = document.getElementById('m-err');
+    if (b.error) { err.textContent = b.error; return; }
+    const e = b.entry;
     if (plan.example) { plan.example = false; }
     const i = plan.entries.findIndex(x => x.id === e.id);
     if (i >= 0) plan.entries[i] = e; else plan.entries.push(e);
@@ -636,16 +738,23 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   }
 
   // ---------- Example plan ----------
+  // A made-up student who made up a clerkship in Phase 3, then took remediation and a flex block:
+  // 52 credit weeks fit, so they are 4 short, which is the case the cushion warning is for.
   function examplePlan() {
-    const s = RULES.calendar.start; const at = n => ymAdd(s, n);
-    const mk = (code, n, half, status) => { const c = BY_CODE[code]; return { id: uid(), code, name: c.name, attrs: c.attrs.slice(), weeks: c.units || 4, half, ym: at(n), status, away: false }; };
+    const s = window_()[0]; const at = n => ymAdd(s, n);
+    const mk = (code, n, half, status, extra) => { const c = BY_CODE[code]; return Object.assign({ id: uid(), code, name: c.name, attrs: c.attrs.slice(), weeks: c.units || 4, half, ym: at(n), status, away: false }, extra || {}); };
+    const sp = (kind, name, n, half, weeks, status) => ({ id: uid(), code: '', name, attrs: SPECIAL[kind].attrs.slice(), custom: true, special: kind, weeks, half, ym: at(n), status, away: false });
     return [
-      mk('MEDICINE 9150', 0, 'full', 'done'), mk('MEDPHASE3 7040', 1, 'full', 'done'),
-      mk('MEDICINE 8030', 2, 'ab', 'done'), mk('MEDICINE 8160', 2, 'cd', 'done'),
-      mk('MEDICINE 9100', 4, 'full', 'registered'), mk('EMED 8021', 5, 'full', 'registered'),
-      mk('MEDPHASE3 7070', 6, 'ab', 'registered'), mk('MEDICINE 8135', 6, 'cd', 'planned'),
-      Object.assign(mk('MEDPHASE3 9998', 7, 'full', 'planned'), { away: true, weeks: 4 }),
-      mk('PSY 8005', 9, 'full', 'planned'), mk('MEDPHASE3 8040', 14, 'full', 'planned')
+      sp('p2', 'Surgery clerkship', 0, 'full', 8, 'done'),
+      sp('rem', 'Remediation', 2, 'ab', 2, 'done'), mk('MEDICINE 8030', 2, 'cd', 'done'),
+      mk('MEDPHASE3 7040', 3, 'full', 'done'), mk('MEDICINE 9150', 4, 'full', 'done'),
+      mk('MEDPHASE3 8010', 5, 'full', 'done', { weeks: 4 }), mk('EMED 8021', 6, 'full', 'done'),
+      mk('MEDICINE 9100', 7, 'full', 'registered'),
+      sp('flex', 'Flex / vacation', 8, 'ab', 2, 'registered'), mk('MEDICINE 8135', 8, 'cd', 'registered'),
+      mk('MEDPHASE3 7010', 9, 'full', 'registered'), mk('PSY 8005', 10, 'full', 'planned'),
+      mk('PEDS 9100', 11, 'full', 'planned'), mk('NEUROL 8201', 12, 'full', 'planned'),
+      mk('RADIOL 8005', 13, 'full', 'planned'), mk('ANESTH 8000', 14, 'full', 'planned'),
+      mk('MEDPHASE3 8040', 15, 'full', 'planned')
     ];
   }
 
@@ -710,6 +819,9 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       if (ymd(m['last reviewed'])) next.reviewed = ymd(m['last reviewed']);
       const a = ym(m['phase 3 starts']), b = ym(m['phase 3 ends']);
       if (a && b && a <= b) next.calendar = { start: a, end: b };
+      const L = m['phase 3 length (weeks)'], C = m['credit weeks required'];
+      if (/^\d+$/.test(L || '') && +L >= 4 && +L <= 200) next.length = +L;
+      if (/^\d+$/.test(C || '') && +C >= 1 && +C <= 200) next.credit = +C;
     }
     const chk = t('checklist'); if (chk) next.checklist = chk.map(r => norm(r[0])).filter(Boolean);
     const dl = t('dates'); if (dl) next.deadlines = dl.map(r => ({ date: ymd(r[0]), label: norm(r[1]) })).filter(d => d.date && d.label);
@@ -741,9 +853,9 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     else if (a === 'edit') { const e = plan.entries.find(x => x.id === b.dataset.id); if (e) openModal(e); }
     else if (a === 'm-close') closeModal();
     else if (a === 'pick') { const c = BY_CODE[b.dataset.code]; const wk = c.units || Math.min(c.max, 4); Object.assign(ui.modal.draft, { code: c.code, custom: false, weeks: wk, half: wk <= 2 ? (ui.modal.draft.half === 'cd' ? 'cd' : ui.modal.draft.half === 'ab' ? 'ab' : '') : 'full' }); renderModal(); }
-    else if (a === 'unpick') { Object.assign(ui.modal.draft, { code: '', special: '', custom: false }); renderModal(); }
-    else if (a === 'special') { const k = b.dataset.kind; Object.assign(ui.modal.draft, { special: k, custom: true, code: '', attrs: [k === 'flex' ? 'FLEX' : 'P2'], weeks: k === 'flex' ? 2 : 4, half: k === 'flex' ? (ui.modal.draft.half === 'cd' ? 'cd' : ui.modal.draft.half === 'ab' ? 'ab' : '') : 'full' }); renderModal(); }
-    else if (a === 'custom') { Object.assign(ui.modal.draft, { custom: true, code: '', attrs: ['ELEC'], weeks: 4, half: 'full' }); renderModal(); }
+    else if (a === 'unpick') { Object.assign(ui.modal.draft, { code: '', special: '', custom: false, name: '' }); renderModal(); }
+    else if (a === 'special') { const k = b.dataset.kind, sp = SPECIAL[k]; const wk = sp.weeks[0] === sp.weeks[1] ? sp.weeks[0] : (k === 'p2' ? 4 : 2); const h0 = ui.modal.draft.half; Object.assign(ui.modal.draft, { special: k, custom: false, code: '', name: '', attrs: sp.attrs.slice(), weeks: wk, half: wk <= 2 ? (h0 === 'cd' ? 'cd' : h0 === 'ab' ? 'ab' : '') : 'full' }); renderModal(); }
+    else if (a === 'custom') { Object.assign(ui.modal.draft, { custom: true, special: '', code: '', attrs: ['ELEC'], weeks: 4, half: 'full', alongside: false }); renderModal(); }
     else if (a === 'half') { syncDraft(); ui.modal.draft.half = b.dataset.half; renderModal(); }
     else if (a === 'm-save') saveModal();
     else if (a === 'm-del') { plan.entries = plan.entries.filter(x => x.id !== ui.modal.id); save(); closeModal(); render(); toast('Removed'); }
@@ -765,7 +877,14 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   document.addEventListener('change', ev => {
     const t = ev.target;
     if (t.dataset && t.dataset.chk) { plan.checks[t.dataset.chk] = t.checked; save(); }
-    else if (t.id === 'from' || t.id === 'to') { if (t.value) { plan[t.id] = t.value; if (plan.from && plan.to && plan.from > plan.to) [plan.from, plan.to] = [plan.to, plan.from]; save(); render(); } }
+    else if (t.id === 'from' || t.id === 'to') {
+      if (t.value) {
+        if (t.id === 'from') { plan.from = t.value; if (!plan.toSet) plan.to = ymAdd(t.value, winMonths() - 1); }
+        else { plan.to = t.value; plan.toSet = true; }
+        if (plan.from && plan.to && plan.from > plan.to) [plan.from, plan.to] = [plan.to, plan.from];
+        save(); render();
+      }
+    }
   });
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && ui.modal) closeModal(); if (ev.key === 'Enter' && ev.target.id === 'm-q') { const f = document.querySelector('#m-res .res'); if (f) { ev.preventDefault(); f.click(); } } });
 
