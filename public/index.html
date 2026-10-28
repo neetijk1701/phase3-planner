@@ -22,19 +22,19 @@ body{margin:0}
   --bg:#f8f7f5; --surface:#ffffff; --sunk:#f1eeeb; --ink:#1e1a19; --muted:#6b6361; --line:#e4dedb;
   --accent:#a51417; --accent-soft:#f6e3e3; --on-accent:#ffffff;
   --done:#2c6e49; --reg:#3a6ea5; --plan:#b9b0ad; --warn:#9a5b00; --warn-bg:#fff4e0; --bad:#b3261e; --bad-bg:#fdecea;
-  --t-acr:#7a1f5c; --t-kisc:#2f5d8a; --t-elec:#4a6b2f; --t-cap:#8a5a00; --t-oth:#5e5653;
+  --t-acr:#7a1f5c; --t-kisc:#2f5d8a; --t-elec:#4a6b2f; --t-cap:#8a5a00; --t-oth:#5e5653; --t-flex:#0f766e; --t-p2:#5b5f97;
   --display:"Fraunces",Georgia,serif; --body:"Source Sans 3",-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#161312; --surface:#201c1b; --sunk:#2a2523; --ink:#f1ebe8; --muted:#a99e9b; --line:#3a3331;
   --accent:#e2575b; --accent-soft:#3a1f20; --on-accent:#1a0c0c;
   --done:#5fbf86; --reg:#7aa9dc; --plan:#6b6260; --warn:#f0b35a; --warn-bg:#3a2c12; --bad:#ff8a80; --bad-bg:#3d1c1a;
-  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; color-scheme:dark}}
+  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; --t-flex:#5fd0c2; --t-p2:#aab0f0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#161312; --surface:#201c1b; --sunk:#2a2523; --ink:#f1ebe8; --muted:#a99e9b; --line:#3a3331;
   --accent:#e2575b; --accent-soft:#3a1f20; --on-accent:#1a0c0c;
   --done:#5fbf86; --reg:#7aa9dc; --plan:#6b6260; --warn:#f0b35a; --warn-bg:#3a2c12; --bad:#ff8a80; --bad-bg:#3d1c1a;
-  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; color-scheme:dark}
+  --t-acr:#e08bc4; --t-kisc:#8db8e6; --t-elec:#a6cf7e; --t-cap:#e7b85a; --t-oth:#b8adaa; --t-flex:#5fd0c2; --t-p2:#aab0f0; color-scheme:dark}
 body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
 #app{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
@@ -155,7 +155,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
 <body>
 <main id="app" aria-live="polite"><p class="muted">Loading the planner…</p></main>
 
-<script id="p3-rules" type="application/json">{"reviewed":"2026-10-28","source":"Washington University Bulletin 2026–27, Doctor of Medicine (public)","calendar":{"start":"2026-03","end":"2027-05"},"rules":[{"id":"total","label":"Total Phase 3 weeks","kind":"min","weeks":64,"all":true,"tags":[],"codes":[],"away":"any","note":""},{"id":"acr","label":"Advanced Clinical Rotations (ACRs)","kind":"min","weeks":12,"all":false,"tags":["ACR"],"codes":[],"away":"any","note":"Three 4-week ACRs, including the Internal Medicine ACR. The bulletin says the remaining two must be completed at WashU."},{"id":"imacr","label":"Internal Medicine ACR","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDICINE 9100"],"away":"any","note":""},{"id":"kisc","label":"KISCs","kind":"min","weeks":8,"all":false,"tags":["KISC"],"codes":[],"away":"any","note":"MSTP students take none."},{"id":"elec","label":"Electives","kind":"min","weeks":32,"all":false,"tags":["ELEC"],"codes":[],"away":"any","note":"Away electives and up to 4 weeks of Step study count here."},{"id":"cap","label":"Phase 3 Capstone","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8040"],"away":"any","note":""},{"id":"step","label":"Step study time","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8010"],"away":"any","note":"Counts toward electives."},{"id":"away","label":"Away electives","kind":"max","weeks":12,"all":false,"tags":[],"codes":["MEDPHASE3 9998"],"away":"any","note":""},{"id":"intl","label":"International away electives","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 9999"],"away":"any","note":""}],"checklist":["Pass the Comprehensive Clinical Exam (MEDICINE 8330)","Take USMLE Step 1 before graduation","Take USMLE Step 2 CK before graduation"],"deadlines":[],"notes":["ACRs, KISCs, electives and the Capstone add up to 56 of the 64 weeks. The bulletin doesn't say what the other 8 weeks are."]}</script>
+<script id="p3-rules" type="application/json">{"reviewed":"2026-10-28","source":"Washington University Bulletin 2026–27, Doctor of Medicine (public)","calendar":{"start":"2026-03","end":"2027-05"},"rules":[{"id":"total","label":"Total Phase 3 weeks","kind":"min","weeks":64,"all":true,"tags":[],"codes":[],"away":"any","note":"Includes flex time. Phase 2 make-up rotations don't count."},{"id":"acr","label":"Advanced Clinical Rotations (ACRs)","kind":"min","weeks":12,"all":false,"tags":["ACR"],"codes":[],"away":"any","note":"Three 4-week ACRs, including the Internal Medicine ACR. The bulletin says the remaining two must be completed at WashU."},{"id":"imacr","label":"Internal Medicine ACR","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDICINE 9100"],"away":"any","note":""},{"id":"kisc","label":"KISCs","kind":"min","weeks":8,"all":false,"tags":["KISC"],"codes":[],"away":"any","note":"MSTP students take none."},{"id":"elec","label":"Electives","kind":"min","weeks":32,"all":false,"tags":["ELEC"],"codes":[],"away":"any","note":"Away electives and up to 4 weeks of Step study count here."},{"id":"cap","label":"Phase 3 Capstone","kind":"min","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8040"],"away":"any","note":""},{"id":"step","label":"Step study time","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 8010"],"away":"any","note":"Counts toward electives."},{"id":"flex","label":"Flex time","kind":"max","weeks":8,"all":false,"tags":["FLEX"],"codes":[],"away":"any","note":"No credit, but it takes up time. Usually taken in 2-week blocks."},{"id":"away","label":"Away electives","kind":"max","weeks":12,"all":false,"tags":[],"codes":["MEDPHASE3 9998"],"away":"any","note":""},{"id":"intl","label":"International away electives","kind":"max","weeks":4,"all":false,"tags":[],"codes":["MEDPHASE3 9999"],"away":"any","note":""}],"checklist":["Pass the Comprehensive Clinical Exam (MEDICINE 8330)","Take USMLE Step 1 before graduation","Take USMLE Step 2 CK before graduation"],"deadlines":[],"notes":["ACRs, KISCs, electives and the Capstone add up to 56 credit weeks. The other 8 of the 64 weeks are flex time, which earns no credit.","Rotations that make up missed Phase 2 credit take up time in your schedule but don't count toward Phase 3."]}</script>
 
 <script id="p3-catalog" type="application/json">[
 ["ANESTH 8000","General Anesthesiology (Clinical Elective)","4","ELEC FOURWO"],
@@ -358,18 +358,21 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
 
   // ---------- Entry facts ----------
   const typeOf = e => {
+    if (e.attrs.includes('FLEX')) return 'flex';
+    if (e.attrs.includes('P2')) return 'p2';
     if (e.code === 'MEDPHASE3 8040') return 'cap';
     if (e.attrs.includes('ACR')) return 'acr';
     if (e.attrs.includes('KISC')) return 'kisc';
     if (e.attrs.includes('ELEC')) return 'elec';
     return 'oth';
   };
-  const TYPE = { acr: ['ACR', '--t-acr'], kisc: ['KISC', '--t-kisc'], elec: ['Elective', '--t-elec'], cap: ['Capstone', '--t-cap'], oth: ['Other', '--t-oth'] };
+  const TYPE = { acr: ['ACR', '--t-acr'], kisc: ['KISC', '--t-kisc'], elec: ['Elective', '--t-elec'], cap: ['Capstone', '--t-cap'], flex: ['Flex', '--t-flex'], p2: ['Phase 2 credit', '--t-p2'], oth: ['Other', '--t-oth'] };
   const isLong = e => { const c = BY_CODE[e.code]; return c ? c.kind === 'Longitudinal' : !!e.longitudinal; };
   const spanMonths = e => e.half === 'full' ? Math.max(1, Math.ceil(e.weeks / 4)) : 1;
   const STATUS = { planned: 'Planned', registered: 'Registered', done: 'Completed' };
 
   function matches(rule, e) {
+    if (e.attrs.includes('P2')) return false; // Phase 2 make-up takes up time but isn't Phase 3
     if (rule.away === 'away' && !e.away) return false;
     if (rule.away === 'home' && e.away) return false;
     if (rule.all) return true;
@@ -459,7 +462,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       const t = total.s, sum = t.done + t.registered + t.planned;
       h += `<div class="panel total"><div class="big">${sum}<small> / ${total.r.weeks} weeks</small></div>
         <div style="display:flex;flex-direction:column;gap:6px;min-width:0">${bar(t, total.r.weeks)}
-        <p class="small muted">${t.done} completed · ${t.registered} registered · ${t.planned} planned · ${Math.max(0, total.r.weeks - sum)} still to plan</p></div></div>`;
+        <p class="small muted">${t.done} completed · ${t.registered} registered · ${t.planned} planned · ${Math.max(0, total.r.weeks - sum)} still to plan</p>${extraLine()}</div></div>`;
     }
     if (ev.warns.length) h += `<div class="warns">${ev.warns.map(w => `<div class="warn${w.bad ? ' bad' : ''}">${w.t}</div>`).join('')}</div>`;
     h += `<div class="reqs">${mins.map(x => `<div class="req"><div class="top"><h3>${esc(x.r.label)}</h3>${pill(x)}</div>${bar(x.s, x.r.weeks)}
@@ -518,6 +521,15 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     if (ui.modal) renderModal();
   }
 
+  function extraLine() {
+    const wk = f => plan.entries.filter(f).reduce((a, e) => a + e.weeks, 0);
+    const flex = wk(e => e.attrs.includes('FLEX')), p2 = wk(e => e.attrs.includes('P2'));
+    const bits = [];
+    if (flex) bits.push(`Includes ${flex} week${flex > 1 ? 's' : ''} of flex time.`);
+    if (p2) bits.push(`${p2} week${p2 > 1 ? 's' : ''} of Phase 2 credit not counted here.`);
+    return bits.length ? `<p class="small muted">${bits.join(' ')}</p>` : '';
+  }
+
   function chip(e, conflict, continued) {
     const [lab, col] = TYPE[typeOf(e)];
     const when = isLong(e) ? 'Longitudinal' : e.half === 'full' ? (e.weeks > 4 ? `${e.weeks} weeks` : 'Full block') : e.half === 'ab' ? 'Weeks 1–2' : 'Weeks 3–4';
@@ -527,7 +539,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   }
 
   function ruleLine(r) {
-    const what = r.all ? 'Every rotation' : [...(r.tags || []).map(t => ({ ACR: 'ACRs', KISC: 'KISCs', ELEC: 'electives' }[t] || t)), ...(r.codes || []).map(c => (BY_CODE[c] ? BY_CODE[c].name : c) + ' (' + c + ')')].join(', ') || 'Nothing selected';
+    const what = r.all ? 'Every rotation except Phase 2 make-up' : [...(r.tags || []).map(t => ({ ACR: 'ACRs', KISC: 'KISCs', ELEC: 'electives', FLEX: 'flex time' }[t] || t)), ...(r.codes || []).map(c => (BY_CODE[c] ? BY_CODE[c].name : c) + ' (' + c + ')')].join(', ') || 'Nothing selected';
     const where = r.away === 'away' ? ', away only' : r.away === 'home' ? ', at WashU only' : '';
     return `${what}${where}`;
   }
@@ -556,22 +568,24 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       const res = CATALOG.filter(x => !q || (x.code + ' ' + x.title).toLowerCase().includes(q)).slice(0, 60);
       h += `<div class="field"><label for="m-q">Find a course</label><input id="m-q" type="search" autocomplete="off" placeholder="Name, department or code, e.g. MICU, KISC, EMED" value="${esc(M.q)}"></div>
         <div class="results" id="m-res">${res.map(x => { const [lab, col] = TYPE[typeOf({ code: x.code, attrs: x.attrs })]; return `<button class="res" style="--tc:var(${col})" data-act="pick" data-code="${esc(x.code)}"><span class="rt">${esc(x.name)}</span><span class="rc">${esc(x.code)}${x.kind && x.kind !== lab ? ' · ' + esc(x.kind) : ''}</span><span class="rw">${lab} · ${x.units ? x.units + ' wk' : x.min + '–' + x.max + ' wk'}</span></button>`; }).join('') || '<p class="small muted" style="padding:10px">No matches in the bulletin catalog.</p>'}</div>
-        <p class="small muted">Not listed? <button class="btn ghost" data-act="custom">Add it by hand</button></p>`;
+        <div class="row small"><span class="muted">Not a course?</span><button class="btn" data-act="special" data-kind="flex" style="--tc:var(--t-flex)">Flex time</button><button class="btn" data-act="special" data-kind="p2">Phase 2 make-up</button><button class="btn ghost" data-act="custom">Something else, by hand</button></div>`;
     } else {
       const [lab, col] = TYPE[typeOf({ code: d.code, attrs: d.attrs || (c ? c.attrs : []) })];
-      if (c) h += `<div class="chosen" style="--tc:var(${col})"><div><div style="font-weight:600">${esc(c.name)}</div><div class="small muted">${esc(c.code)} · ${lab}${c.units ? ' · ' + c.units + ' weeks' : ''}</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
-      else h += `<div class="grid2"><div class="field" style="grid-column:1 / -1"><label for="m-name">Rotation name</label><input id="m-name" value="${esc(d.name || '')}" placeholder="e.g. Away sub-I, Cardiology at another school"></div>
+      if (d.special === 'flex') h += `<div class="chosen" style="--tc:var(--t-flex)"><div><div style="font-weight:600">Flex time</div><div class="small muted">2 weeks · no credit, but it takes up time</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
+      else if (d.special === 'p2') h += `<div class="chosen" style="--tc:var(--t-p2)"><div style="min-width:0;flex:1"><div class="field"><label for="m-name">What are you making up?</label><input id="m-name" value="${esc(d.name || '')}" placeholder="e.g. Surgery clerkship"></div><div class="small muted" style="margin-top:6px">Phase 2 credit. Takes up time in your schedule but doesn't count toward Phase 3.</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
+      else if (c) h += `<div class="chosen" style="--tc:var(${col})"><div><div style="font-weight:600">${esc(c.name)}</div><div class="small muted">${esc(c.code)} · ${lab}${c.units ? ' · ' + c.units + ' weeks' : ''}</div></div>${M.id ? '' : '<button class="btn ghost" data-act="unpick">Change</button>'}</div>`;
+      else if (!d.special) h += `<div class="grid2"><div class="field" style="grid-column:1 / -1"><label for="m-name">Rotation name</label><input id="m-name" value="${esc(d.name || '')}" placeholder="e.g. Away sub-I, Cardiology at another school"></div>
         <div class="field"><label for="m-type">Counts as</label><select id="m-type">${[['ELEC', 'Elective'], ['ACR', 'ACR'], ['KISC', 'KISC'], ['', 'Other']].map(([v, l]) => `<option value="${v}" ${(d.attrs || ['ELEC'])[0] === v || (!v && !(d.attrs || ['ELEC']).length) ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="field"><label for="m-code">Course code (optional)</label><input id="m-code" value="${esc(d.code || '')}" placeholder="e.g. MEDPHASE3 9998"></div></div>`;
-      const fixed = c && c.units && !(c.kind === 'Longitudinal');
+      const fixed = (c && c.units && !(c.kind === 'Longitudinal')) || d.special === 'flex';
       const weeksOpts = fixed ? null : (c ? [c.min || 1, c.max || 4] : [1, 12]);
       h += `<div class="grid2"><div class="field"><label for="m-ym">Month</label><select id="m-ym"><option value="">Choose…</option>${months.map(ym => `<option value="${ym}" ${d.ym === ym ? 'selected' : ''}>${ymLabel(ym)}</option>`).join('')}</select></div>`;
       if (!fixed) h += `<div class="field"><label for="m-weeks">Weeks</label><input id="m-weeks" type="number" min="${weeksOpts[0]}" max="${weeksOpts[1]}" value="${d.weeks || (c && c.kind === 'Longitudinal' ? c.units : 4)}"></div>`;
       h += `<div class="field"><label for="m-status">Status</label><select id="m-status">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}" ${d.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`;
-      const twoWeek = fixed ? c.units === 2 : (d.weeks || 4) <= 2;
+      const twoWeek = d.special === 'flex' ? true : fixed ? c.units === 2 : (d.weeks || 4) <= 2;
       if (!(c && c.kind === 'Longitudinal')) h += `<div class="field"><span class="flabel">Which weeks</span><div class="seg" role="group" aria-label="Which weeks">${twoWeek ? `<button data-act="half" data-half="ab" aria-pressed="${d.half === 'ab'}">Weeks 1–2</button><button data-act="half" data-half="cd" aria-pressed="${d.half === 'cd'}">Weeks 3–4</button>` : `<button aria-pressed="true" disabled>Starts week 1 of the month</button>`}</div></div>`;
       const autoAway = d.code === 'MEDPHASE3 9998' || d.code === 'MEDPHASE3 9999';
-      h += `<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="m-away" ${d.away || autoAway ? 'checked' : ''} ${autoAway ? 'disabled' : ''}> Away rotation (not at WashU)</label>`;
+      if (!d.special) h += `<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="m-away" ${d.away || autoAway ? 'checked' : ''} ${autoAway ? 'disabled' : ''}> Away rotation (not at WashU)</label>`;
       h += `<p class="small" id="m-err" role="alert" style="color:var(--bad)"></p>
         <div class="row"><button class="btn primary" data-act="m-save">${M.id ? 'Save changes' : 'Add to plan'}</button>${M.id ? '<button class="btn ghost danger" data-act="m-del">Remove</button>' : ''}</div>`;
     }
@@ -580,7 +594,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     const q = document.getElementById('m-q');
     if (q) q.addEventListener('input', () => { ui.modal.q = q.value; const pos = q.selectionStart; renderModal(); const nq = document.getElementById('m-q'); nq.focus(); try { nq.setSelectionRange(pos, pos); } catch (e) {} });
     const w = document.getElementById('m-weeks');
-    if (w) w.addEventListener('change', () => { syncDraft(); if ((ui.modal.draft.weeks || 4) > 2) ui.modal.draft.half = 'full'; renderModal(); });
+    if (w) w.addEventListener('change', () => { syncDraft(); if ((ui.modal.draft.weeks || 4) > 2) ui.modal.draft.half = 'full'; setTimeout(() => { if (ui.modal) renderModal(); }, 0); });
   }
   function syncDraft() {
     const d = ui.modal.draft; const g = id => document.getElementById(id);
@@ -594,9 +608,15 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   }
   function saveModal() {
     syncDraft();
-    const d = ui.modal.draft, c = d.code && !d.custom ? BY_CODE[d.code] : null, err = document.getElementById('m-err');
+    const d = ui.modal.draft, c = d.code && !d.custom && !d.special ? BY_CODE[d.code] : null, err = document.getElementById('m-err');
     const e = { id: ui.modal.id || uid(), status: d.status || 'planned', ym: d.ym, away: !!d.away };
-    if (c) {
+    if (d.special === 'flex') {
+      Object.assign(e, { code: '', name: 'Flex time', attrs: ['FLEX'], custom: true, special: 'flex', weeks: 2, half: d.half, away: false });
+    } else if (d.special === 'p2') {
+      if (!d.name) { err.textContent = 'Say what you are making up, e.g. Surgery clerkship.'; return; }
+      Object.assign(e, { code: '', name: d.name, attrs: ['P2'], custom: true, special: 'p2', weeks: Math.min(12, Math.max(1, d.weeks || 4)), away: false });
+      e.half = e.weeks <= 2 ? d.half : 'full';
+    } else if (c) {
       Object.assign(e, { code: c.code, name: c.name, attrs: c.attrs.slice() });
       if (c.kind === 'Longitudinal') { e.weeks = c.units; e.half = 'full'; }
       else if (c.units) { e.weeks = c.units; e.half = c.units === 2 ? d.half : 'full'; }
@@ -641,7 +661,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     settings: ['setting', 'value'], checklist: ['item'], dates: ['date', 'what'], notes: ['note']
   };
   const headerOk = (rows, want) => rows && rows.length && want.every((h, i) => lc(rows[0][i]) === h);
-  const TAGS = { 'acrs': 'ACR', 'acr': 'ACR', 'kiscs': 'KISC', 'kisc': 'KISC', 'electives': 'ELEC', 'elective': 'ELEC' };
+  const TAGS = { 'flex': 'FLEX', 'flex time': 'FLEX', 'acrs': 'ACR', 'acr': 'ACR', 'kiscs': 'KISC', 'kisc': 'KISC', 'electives': 'ELEC', 'elective': 'ELEC' };
   const WHERE = { 'anywhere': 'any', '': 'any', 'at washu only': 'home', 'away only': 'away' };
   function ymd(v) {
     v = norm(v); let m;
@@ -721,7 +741,8 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     else if (a === 'edit') { const e = plan.entries.find(x => x.id === b.dataset.id); if (e) openModal(e); }
     else if (a === 'm-close') closeModal();
     else if (a === 'pick') { const c = BY_CODE[b.dataset.code]; const wk = c.units || Math.min(c.max, 4); Object.assign(ui.modal.draft, { code: c.code, custom: false, weeks: wk, half: wk <= 2 ? (ui.modal.draft.half === 'cd' ? 'cd' : ui.modal.draft.half === 'ab' ? 'ab' : '') : 'full' }); renderModal(); }
-    else if (a === 'unpick') { ui.modal.draft.code = ''; renderModal(); }
+    else if (a === 'unpick') { Object.assign(ui.modal.draft, { code: '', special: '', custom: false }); renderModal(); }
+    else if (a === 'special') { const k = b.dataset.kind; Object.assign(ui.modal.draft, { special: k, custom: true, code: '', attrs: [k === 'flex' ? 'FLEX' : 'P2'], weeks: k === 'flex' ? 2 : 4, half: k === 'flex' ? (ui.modal.draft.half === 'cd' ? 'cd' : ui.modal.draft.half === 'ab' ? 'ab' : '') : 'full' }); renderModal(); }
     else if (a === 'custom') { Object.assign(ui.modal.draft, { custom: true, code: '', attrs: ['ELEC'], weeks: 4, half: 'full' }); renderModal(); }
     else if (a === 'half') { syncDraft(); ui.modal.draft.half = b.dataset.half; renderModal(); }
     else if (a === 'm-save') saveModal();
