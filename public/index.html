@@ -118,8 +118,16 @@ details.more summary{cursor:pointer;width:max-content}
 .add{border:1px dashed var(--line);background:transparent;border-radius:7px;color:var(--muted);font-size:13px;padding:8px;width:100%;text-align:left}
 .add:hover{color:var(--ink);border-color:var(--muted)}
 .typetag{font-weight:700;color:var(--tc)}
-.longrow{border-top:1px solid var(--line);padding:8px 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.longrow .chip{width:auto}
+.sched{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px;align-items:start}
+.side{display:flex;flex-direction:column;gap:10px;position:sticky;top:calc(12px + env(safe-area-inset-top,0px));min-width:0}
+.side .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.side select{border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:var(--bg)}
+.lcard{border:1px solid var(--line);border-left:4px solid var(--t-elec);border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:6px}
+.lcard.on{background:color-mix(in srgb,var(--t-elec) 9%,transparent)}
+.lcard .lt{font-weight:600;font-size:14px;line-height:1.3}
+.lcard .btn{align-self:flex-start}
+.side.flash{box-shadow:0 0 0 3px var(--accent)}
+@media (max-width:900px){.sched{grid-template-columns:1fr}.side{position:static;order:-1}}
 
 /* Modal */
 .scrim{position:fixed;inset:0;background:rgba(10,8,8,.45);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));overflow:auto}
@@ -377,7 +385,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   };
   const range = () => {
     const out = window_();
-    plan.entries.forEach(e => { for (let i = 0; i < spanMonths(e); i++) { const ym = ymAdd(e.ym, i); if (e.ym && !out.includes(ym)) out.push(ym); } });
+    plan.entries.forEach(e => { if (!e.ym || isLong(e)) return; for (let i = 0; i < spanMonths(e); i++) { const ym = ymAdd(e.ym, i); if (!out.includes(ym)) out.push(ym); } });
     return out.sort();
   };
 
@@ -398,6 +406,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   // "Alongside" rotations (longitudinal electives, approved exceptions) earn credit without taking a block.
   // Workday lists the longitudinal electives under different codes than the bulletin.
   const ALIAS = { 'MEDINTER 8015': 'MSS 8010', 'MEDINTER 8016': 'MSS 8015' };
+  const NICK = { 'MEDINTER 8016': 'CIPE' };
   const isLong = e => { const c = BY_CODE[e.code]; return (c && c.kind === 'Longitudinal') || !!e.alongside || !!e.longitudinal; };
   const spanMonths = e => e.half === 'full' ? Math.max(1, Math.ceil(e.weeks / 4)) : 1;
   const STATUS = { planned: 'Planned', registered: 'Registered', done: 'Completed' };
@@ -486,7 +495,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       const c = BY_CODE[list[0].code];
       if (list.length > 1 && (c.attrs.includes('TWOWO') || c.attrs.includes('FOURWO'))) warns.push({ t: `<b>${esc(c.name)}</b> is in your plan ${list.length} times. The bulletin lists it as a ${c.attrs.includes('TWOWO') ? '2' : '4'}-week-only course, not a repeatable one. Check that it can count twice.` });
     });
-    const outside = plan.entries.filter(e => !cu.win.includes(e.ym));
+    const outside = plan.entries.filter(e => e.ym && !isLong(e) && !cu.win.includes(e.ym));
     if (outside.length) warns.push({ t: `<b>${plural(outside.length, 'rotation')} ${outside.length > 1 ? 'are' : 'is'} outside your Phase 3 (${ymLabel(cu.win[0])}–${ymLabel(cu.win[cu.win.length - 1])}).</b> ${outside.length > 1 ? "They don't" : "It doesn't"} take up Phase 3 time. Change "My Phase 3" above the schedule if your dates are different.` });
     return { rules, warns, conflict, cu };
   }
@@ -502,7 +511,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     return { done: '<span class="pill ok">Completed</span>', reg: '<span class="pill reg">Registered</span>', planned: '<span class="pill short">Planned</span>', short: `<span class="pill short">${Math.max(0, x.r.weeks - x.sum)} wk to go</span>` }[x.state];
   };
   function cushionState(cu) {
-    if (cu.left < 0) return { cls: 'bad', head: `${plural(-cu.left, 'week')} short`, text: `Even if every open week becomes a credit rotation, you'd reach ${cu.credit + cu.open} of ${CREDIT()} credit weeks. Longitudinal electives (like Clinical Mentoring or IPE) earn credit alongside your blocks. They start on set dates and fill up, so talk to the Phase 3 Registration &amp; Electives Office early.`, action: '<button class="btn" data-act="add-long">Add a longitudinal elective</button>' };
+    if (cu.left < 0) return { cls: 'bad', head: `${plural(-cu.left, 'week')} short`, text: `Even if every open week becomes a credit rotation, you'd reach ${cu.credit + cu.open} of ${CREDIT()} credit weeks. Longitudinal electives (like Clinical Mentoring or IPE) earn credit alongside your blocks. They start on set dates and fill up, so talk to the Phase 3 Registration &amp; Electives Office early.`, action: '<button class="btn" data-act="goto-side">See longitudinal electives</button>' };
     if (cu.left === 0) return { cls: 'zero', head: 'No cushion left', text: `Every open week has to be a credit rotation. Any flex, vacation or remediation from here puts you short.` };
     return { cls: 'ok', head: `${plural(cu.left, 'week')} of cushion left`, text: `You can spend ${cu.left === 1 ? 'this week' : 'these weeks'} on flex, vacation or anything else without credit and still graduate on time.` };
   }
@@ -547,7 +556,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     h += `<section class="section" aria-labelledby="cal-h"><div class="section-head"><h2 id="cal-h">Your schedule</h2>
       <div class="row small"><span class="muted">My Phase 3:</span><label class="sr" for="from">Starts</label><input type="month" id="from" value="${esc(cu.win[0])}" class="btn ghost" style="font-weight:400">
       <label class="muted" for="to">to</label><input type="month" id="to" value="${esc(cu.win[cu.win.length - 1])}" class="btn ghost" style="font-weight:400"></div></div>
-      <div class="cal"><div class="cal-head"><span>Month</span><span>Weeks 1–2</span><span>Weeks 3–4</span></div>`;
+      <div class="sched"><div class="cal"><div class="cal-head"><span>Month</span><span>Weeks 1–2</span><span>Weeks 3–4</span></div>`;
     const cont = {};
     plan.entries.filter(e => !isLong(e)).forEach(e => { for (let i = 1; i < spanMonths(e); i++) (cont[ymAdd(e.ym, i)] = cont[ymAdd(e.ym, i)] || []).push(e); });
     months.forEach(ym => {
@@ -564,9 +573,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       if (cdFree) h += `<div class="slot s-cd"><button class="add" data-act="add" data-ym="${ym}" data-half="cd">+ Add weeks 3–4</button></div>`;
       h += `</div>`;
     });
-    const longs = plan.entries.filter(isLong);
-    if (longs.length) h += `<div class="longrow"><span class="small muted">Longitudinal and exceptions (credit without taking a block):</span>${longs.map(e => chip(e, new Set())).join('')}</div>`;
-    h += `</div></section>`;
+    h += `</div>${sidebar()}</div></section>`;
 
     // Checklist
     if (RULES.checklist.length || RULES.deadlines.length) {
@@ -590,6 +597,28 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
 
     appEl.innerHTML = h;
     if (ui.modal) renderModal();
+  }
+
+  // Sidebar: longitudinal electives earn credit alongside the blocks and aren't tied to a month.
+  function sidebar() {
+    const catLongs = CATALOG.filter(x => x.kind === 'Longitudinal');
+    const longEntries = plan.entries.filter(e => isLong(e) && !e.exception);
+    const customLongs = longEntries.filter(e => !catLongs.some(x => x.code === e.code));
+    const exceptions = plan.entries.filter(e => e.exception);
+    const wk = longEntries.concat(exceptions).reduce((a, e) => a + e.weeks, 0);
+    let h = `<aside class="side panel" id="side" aria-labelledby="side-h"><div class="top"><h3 id="side-h">Longitudinal electives</h3>${wk ? `<span class="num small">${plural(wk, 'credit week')}</span>` : ''}</div>
+      <p class="small muted">Earn credit alongside your blocks, without taking a slot. They start on set dates and fill up, so check add deadlines early.</p>`;
+    catLongs.forEach(x => {
+      const e = plan.entries.find(p => p.code === x.code);
+      const nm = x.name.replace(' Student Teaching Certificate', ' Certificate') + (NICK[x.code] ? ` (${NICK[x.code]})` : '');
+      h += `<div class="lcard${e ? ' on' : ''}"><div class="lt">${esc(nm)}</div><div class="small muted">Workday ${esc(ALIAS[x.code] || x.code)} · ${plural(x.units, 'credit week')}</div>
+        ${e ? `<div class="row small"><label class="sr" for="ls-${e.id}">Status</label><select id="ls-${e.id}" data-lstatus="${e.id}">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}" ${e.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="btn ghost danger" data-act="ldel" data-id="${e.id}">Remove</button></div>`
+             : `<button class="btn" data-act="ladd" data-code="${esc(x.code)}">Add</button>`}</div>`;
+    });
+    customLongs.forEach(e => { h += chip(e, new Set()); });
+    h += `<button class="add" data-act="add-long-custom">+ Another longitudinal elective</button>`;
+    if (exceptions.length) h += `<p class="flabel" style="margin-top:6px">Approved exceptions</p>${exceptions.map(e => chip(e, new Set())).join('')}`;
+    return h + `</aside>`;
   }
 
   function chip(e, conflict, continued) {
@@ -649,7 +678,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
       e.half = e.alongside ? 'full' : e.weeks <= 2 ? d.half : 'full';
       if (!e.alongside) { delete e.longitudinal; delete e.exception; }
     }
-    if (!e.ym) return { error: 'Choose a month.' };
+    if (!e.ym && !isLong(e)) return { error: 'Choose a month.' };
     if (e.half !== 'full' && e.half !== 'ab' && e.half !== 'cd') return { error: 'Choose weeks 1–2 or weeks 3–4.' };
     return { entry: e };
   }
@@ -686,7 +715,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
         <div class="row small"><button class="btn" data-act="long-custom">Another longitudinal elective</button><button class="btn ghost" data-act="unpick">Back</button></div>`;
     } else if (!d.code && !d.custom && !d.special) {
       const q = M.q.trim().toLowerCase();
-      const res = CATALOG.filter(x => !q || (x.code + ' ' + (ALIAS[x.code] || '') + ' ' + x.title).toLowerCase().includes(q)).slice(0, 60);
+      const res = CATALOG.filter(x => !q || (x.code + ' ' + (ALIAS[x.code] || '') + ' ' + (NICK[x.code] || '') + ' ' + x.title).toLowerCase().includes(q)).slice(0, 60);
       h += `<div class="field"><label for="m-q">Find a course</label><input id="m-q" type="search" autocomplete="off" placeholder="Name, department or code, e.g. MICU, KISC, EMED" value="${esc(M.q)}"></div>
         <div class="results" id="m-res">${res.map(x => { const [lab, col] = TYPE[typeOf({ code: x.code, attrs: x.attrs })]; return `<button class="res" style="--tc:var(${col})" data-act="pick" data-code="${esc(x.code)}"><span class="rt">${esc(x.name)}</span><span class="rc">${esc(x.code)}${ALIAS[x.code] ? ' · Workday ' + esc(ALIAS[x.code]) : ''}${x.kind && x.kind !== lab ? ' · ' + esc(x.kind) : ''}</span><span class="rw">${lab} · ${x.units ? x.units + ' wk' : x.min + '–' + x.max + ' wk'}</span></button>`; }).join('') || '<p class="small muted" style="padding:10px">No matches in the bulletin catalog.</p>'}</div>
         <div class="row small"><span class="muted">Other options:</span><button class="btn" data-act="long-mode">Longitudinal elective</button><button class="btn" data-act="special" data-kind="flex">Flex / vacation</button><button class="btn" data-act="special" data-kind="rem">Remediation</button><button class="btn" data-act="special" data-kind="p2">Phase 2 make-up</button><button class="btn ghost" data-act="custom">Something else, by hand</button></div>`;
@@ -701,7 +730,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
         ${d.longCustom ? '<p class="small muted" style="grid-column:1 / -1">Longitudinal: earns credit alongside your other blocks without taking one up.</p>' : `<details class="more" style="grid-column:1 / -1" ${d.exception ? 'open' : ''}><summary class="small muted">Approved exception</summary><label class="small" style="display:flex;gap:8px;align-items:flex-start;margin-top:6px"><input type="checkbox" id="m-exc" ${d.exception ? 'checked' : ''} style="margin-top:3px"> The Phase 3 office approved this as an exception that doesn't take up a block.</label></details>`}</div>`;
       const fixed = (c && c.units && !(c.kind === 'Longitudinal')) || (sp && sp.weeks[0] === sp.weeks[1]);
       const weeksOpts = fixed ? null : sp ? sp.weeks : (c ? [c.min || 1, c.max || 4] : [1, 12]);
-      h += `<div class="grid2"><div class="field"><label for="m-ym">${d.alongside ? 'Starts in' : 'Month'}</label><select id="m-ym"><option value="">Choose…</option>${months.map(ym => `<option value="${ym}" ${d.ym === ym ? 'selected' : ''}>${ymLabel(ym)}</option>`).join('')}</select></div>`;
+      h += `<div class="grid2"><div class="field"><label for="m-ym">${(d.alongside || (c && c.kind === 'Longitudinal')) ? 'Starts in (optional)' : 'Month'}</label><select id="m-ym"><option value="">${(d.alongside || (c && c.kind === 'Longitudinal')) ? 'Not tied to a month' : 'Choose…'}</option>${months.map(ym => `<option value="${ym}" ${d.ym === ym ? 'selected' : ''}>${ymLabel(ym)}</option>`).join('')}</select></div>`;
       if (!fixed) h += `<div class="field"><label for="m-weeks">Weeks</label><input id="m-weeks" type="number" min="${weeksOpts[0]}" max="${weeksOpts[1]}" value="${d.weeks || (c && c.kind === 'Longitudinal' ? c.units : sp ? sp.weeks[0] : 4)}"></div>`;
       h += `<div class="field"><label for="m-status">Status</label><select id="m-status">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}" ${d.status === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`;
       const twoWeek = sp && sp.weeks[1] === 2 ? true : fixed ? c.units === 2 : (d.weeks || 4) <= 2;
@@ -869,6 +898,10 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
     else if (a === 'long-mode') { ui.modal.mode = 'long'; renderModal(); }
     else if (a === 'long-custom') { Object.assign(ui.modal.draft, { custom: true, special: '', code: '', attrs: ['ELEC'], weeks: 2, half: 'full', alongside: true, longCustom: true, exception: false }); renderModal(); }
     else if (a === 'add-long') { openModal(null); ui.modal.mode = 'long'; renderModal(); }
+    else if (a === 'goto-side') { const sd = document.getElementById('side'); if (sd) { sd.scrollIntoView({ behavior: 'smooth', block: 'start' }); sd.classList.add('flash'); setTimeout(() => sd.classList.remove('flash'), 1400); } }
+    else if (a === 'ladd') { const c = BY_CODE[b.dataset.code]; if (plan.example) plan.example = false; plan.entries.push({ id: uid(), code: c.code, name: c.name, attrs: c.attrs.slice(), weeks: c.units, half: 'full', ym: '', status: 'planned', away: false }); save(); render(); toast('Added to your plan'); }
+    else if (a === 'ldel') { plan.entries = plan.entries.filter(x => x.id !== b.dataset.id); save(); render(); toast('Removed'); }
+    else if (a === 'add-long-custom') { openModal(null); Object.assign(ui.modal.draft, { custom: true, special: '', code: '', attrs: ['ELEC'], weeks: 2, half: 'full', alongside: true, longCustom: true, exception: false }); renderModal(); }
     else if (a === 'half') { syncDraft(); ui.modal.draft.half = b.dataset.half; renderModal(); }
     else if (a === 'm-save') saveModal();
     else if (a === 'm-del') { plan.entries = plan.entries.filter(x => x.id !== ui.modal.id); save(); closeModal(); render(); toast('Removed'); }
@@ -890,6 +923,7 @@ textarea.code{font:12px/1.4 var(--mono);min-height:70px;width:100%}
   document.addEventListener('change', ev => {
     const t = ev.target;
     if (t.dataset && t.dataset.chk) { plan.checks[t.dataset.chk] = t.checked; save(); }
+    else if (t.dataset && t.dataset.lstatus) { const e = plan.entries.find(x => x.id === t.dataset.lstatus); if (e) { e.status = t.value; save(); render(); } }
     else if (t.id === 'from' || t.id === 'to') {
       if (t.value) {
         if (t.id === 'from') { plan.from = t.value; if (!plan.toSet) plan.to = ymAdd(t.value, winMonths() - 1); }
